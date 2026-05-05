@@ -363,3 +363,7 @@ footer {
   color: #aaa;
 }
 
+.nav-links a.active {
+  background-color: white;
+  color: #49b1c8;
+}
