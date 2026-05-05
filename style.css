@@ -48,6 +48,11 @@ header {
   color: #49b1c8;
 }
 
+.nav-links a.active {
+  background-color: white;
+  color: #49b1c8;
+}
+
 .hero {
   display: flex;
   align-items: center;
@@ -375,10 +380,7 @@ footer {
   color: #aaa;
 }
 
-.nav-links a.active {
-  background-color: white;
-  color: #49b1c8;
-}
+
 
 .page-containers {
   padding: 100px 10% 60px 10%;

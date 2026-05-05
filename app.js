@@ -67,6 +67,8 @@ galleryCards.forEach((card, index) => {
   galleryObserver.observe(card);
 });
 
+
+// fungsi untuk menampilkan loader saat pindah halaman
 window.onload = () => {
   document.querySelector(".page").classList.add("show");
 };
