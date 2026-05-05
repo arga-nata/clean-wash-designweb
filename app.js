@@ -25,6 +25,7 @@ function scrollLayanan() {
   });
 }
 
+
 // fungsi scroll ke layanan dengan animasi munculnya card
 const cards = document.querySelectorAll(".service-card");
 
@@ -60,6 +61,6 @@ const galleryObserver = new IntersectionObserver((entries) => {
 });
 
 galleryCards.forEach((card, index) => {
-  card.style.transitionDelay = `${index * 0.25}s`;
+  card.style.transitionDelay = `${index * 0.5}s`;
   galleryObserver.observe(card);
 });

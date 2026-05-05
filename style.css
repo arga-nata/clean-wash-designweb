@@ -377,3 +377,16 @@ footer {
   padding: 100px 10% 60px 10%;
   text-align: center;
 }
+
+.gradient-text {
+  background: linear-gradient(90deg, #ffffff, #00bcd4, #ffffff);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: gradientMove 3s linear infinite;
+  
+}
+
+@keyframes gradientMove {
+  to { background-position: 200%; }
+}
