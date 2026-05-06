@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pemesanan - CleanWash Laundry</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <style>
+      .order-section {
+        padding: 100px 0;
+        background: #f8fafc;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+      }
+
+      .order-wrapper {
+        padding: 0 5%;
+        max-width: 1400px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 32px;
+        align-items: start;
+        box-sizing: border-box;
+      }
+
+      .main-order-card,
+      .summary-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        box-sizing: border-box;
+      }
+
+      .order-section-title,
+      .summary-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        position: relative;
+        padding-bottom: 10px;
+      }
+
+      .order-section-title::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background-color: #49b1c8;
+        border-radius: 2px;
+      }
+
+      .summary-title {
+        justify-content: flex-start;
+        text-align: left;
+      }
+
+      .summary-title::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background-color: #49b1c8;
+        border-radius: 2px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 20px;
+      }
+
+      .field label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #666;
+      }
+      .field input,
+      .field select {
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-family: "Poppins", sans-serif;
+        font-size: 1rem;
+        outline: none;
+        transition: border 0.3s;
+        background-color: white;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .field select {
+        padding-right: 35px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+      }
+
+      .field input:focus,
+      .field select:focus {
+        border-color: #49b1c8;
+      }
+
+      /* Ngehide spin-button angka */
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      .btn-add-pill {
+        background: #49b1c8;
+        color: white;
+        border: none;
+        padding: 14px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 100%;
+        font-size: 1rem;
+      }
+
+      .btn-add-pill:hover {
+        background: #3d92a4;
+      }
+
+      .customer-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .customer-grid .full-width {
+        grid-column: span 2;
+      }
+
+      .summary-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+
+      .cart-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .item-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+        text-align: left;
+      }
+
+      .item-name {
+        font-weight: 700;
+        color: #333;
+        font-size: 0.95rem;
+      }
+
+      .item-qty {
+        font-size: 0.8rem;
+        color: #666;
+        white-space: nowrap;
+      }
+
+      .item-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+
+      .item-price {
+        font-weight: 700;
+        color: #333;
+        font-size: 0.95rem;
+      }
+
+      .btn-del {
+        background: #49b1c8;
+        color: white;
+        border: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
+
+      .btn-del:hover {
+        background: #3d92a4;
+      }
+
+      .total-block {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 0;
+        border-top: 2px solid #f1f5f9;
+        margin-bottom: 20px;
+      }
+
+      .total-label {
+        font-weight: 700;
+        color: #333;
+        font-size: 1.1rem;
+      }
+
+      .total-amount {
+        font-weight: 800;
+        color: #49b1c8;
+        font-size: 1.5rem;
+      }
+
+      .total-estimate-label {
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 600;
+      }
+
+      .btn-whatsapp {
+        width: 100%;
+        background: #49b1c8;
+        color: white;
+        border: none;
+        padding: 16px;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .btn-whatsapp:hover {
+        background: #3d92a4;
+      }
+
+      .btn-whatsapp:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      @media (max-width: 992px) {
+        .order-wrapper {
+          grid-template-columns: 1fr;
+        }
+        .customer-grid {
+          grid-template-columns: 1fr;
+        }
+        .customer-grid .full-width {
+          grid-column: span 1;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="loader">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="page">
+      <header>
+        <nav class="nav">
+          <div class="logo"><span class="gradient-text">CleanWash</span></div>
+          <ul class="nav-links">
+            <li><a href="index.html">Beranda</a></li>
+            <li><a href="tentang_kami.html">Tentang Kami</a></li>
+            <li><a href="harga.html">Daftar Harga</a></li>
+            <li><a href="keranjang.html" class="active">Pemesanan</a></li>
+            <li><a href="galeri.html">Galeri</a></li>
+            <li><a href="kontak.html">Hubungi Kami</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <section class="order-section">
+        <div class="order-wrapper">
+          <!-- FORM PEMESANAN -->
+          <div class="main-order-card">
+            <h2 class="order-section-title">
+              <iconify-icons
+                name="material-symbols:shopping-cart-outline"
+              ></iconify-icons>
+              Formulir Pemesanan Layanan
+            </h2>
+
+            <div class="field">
+              <label for="serviceSelect">Pilih Jenis Layanan</label>
+              <select id="serviceSelect" onchange="updatePlaceholder()">
+                <option value="" disabled selected>-- Pilih Layanan --</option>
+                <option
+                  value="Cuci Kering"
+                  data-price="6000"
+                  data-unit="kg"
+                  data-estimate="2 Hari"
+                >
+                  Cuci Kering (Rp 6.000/kg)
+                </option>
+                <option
+                  value="Cuci Setrika"
+                  data-price="7000"
+                  data-unit="kg"
+                  data-estimate="2 Hari"
+                >
+                  Cuci Setrika (Rp 7.000/kg)
+                </option>
+                <option
+                  value="Setrika Saja"
+                  data-price="5000"
+                  data-unit="kg"
+                  data-estimate="1 Hari"
+                >
+                  Setrika Saja (Rp 5.000/kg)
+                </option>
+                <option
+                  value="Cuci Karpet"
+                  data-price="15000"
+                  data-unit="pcs"
+                  data-estimate="3 Hari"
+                >
+                  Cuci Karpet (Rp 15.000/pcs)
+                </option>
+                <option
+                  value="Cuci Selimut"
+                  data-price="12000"
+                  data-unit="pcs"
+                  data-estimate="2 Hari"
+                >
+                  Cuci Selimut (Rp 12.000/pcs)
+                </option>
+                <option
+                  value="Cuci Jas"
+                  data-price="25000"
+                  data-unit="pcs"
+                  data-estimate="3 Hari"
+                >
+                  Cuci Jas (Rp 25.000/pcs)
+                </option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="serviceQty">Jumlah Pesanan</label>
+              <input
+                type="number"
+                id="serviceQty"
+                placeholder="Masukkan jumlah pesanan..."
+                min="1"
+              />
+            </div>
+
+            <button class="btn-add-pill" onclick="handleAddToCart()">
+              Tambahkan ke Daftar Pesanan
+            </button>
+
+            <div
+              style="
+                margin: 30px 0;
+                border-top: 1px solid #eee;
+                padding-top: 30px;
+              "
+            >
+              <div class="customer-grid">
+                <div class="field">
+                  <label for="custName">Nama Lengkap</label>
+                  <input
+                    type="text"
+                    id="custName"
+                    placeholder="Masukkan nama lengkap Anda..."
+                    oninput="capitalizeInput(this)"
+                  />
+                </div>
+                <div class="field">
+                  <label for="custPhone">No. WhatsApp</label>
+                  <input
+                    type="text"
+                    id="custPhone"
+                    placeholder="Contoh: 081234567890"
+                    oninput="capitalizeInput(this)"
+                  />
+                </div>
+                <div class="field full-width">
+                  <label for="custAddress">Alamat Lengkap</label>
+                  <input
+                    type="text"
+                    id="custAddress"
+                    placeholder="Masukkan alamat lengkap penjemputan..."
+                    oninput="capitalizeInput(this)"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RINGKASAN -->
+          <div class="summary-card">
+            <h2 class="summary-title">Ringkasan Pesanan</h2>
+
+            <div id="cartList" class="cart-list">
+              <!-- JS -->
+            </div>
+
+            <div class="total-block" id="totalBlock">
+              <div>
+                <div class="total-label">Total Pembayaran</div>
+                <div class="total-estimate-label">
+                  Estimasi Waktu Selesai: <span id="totalEstimate">0 Hari</span>
+                </div>
+              </div>
+              <div class="total-amount" id="totalAmount">Rp 0</div>
+            </div>
+
+            <div id="btnWhatsAppWrapper">
+              <button
+                id="btnWhatsApp"
+                class="btn-whatsapp"
+                disabled
+                onclick="kirimWhatsApp()"
+              >
+                Kirim Pesanan via WhatsApp
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div class="footer-content">
+          <div class="footer-logo">CleanWash</div>
+          <p class="footer-copy">
+            &copy; 2026 CleanWash Laundry. All Rights Reserved.
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+      function handleAddToCart() {
+        const select = document.getElementById("serviceSelect");
+        const qtyInput = document.getElementById("serviceQty");
+
+        if (!select.value) {
+          alert("Mohon pilih layanan terlebih dahulu.");
+          return;
+        }
+
+        if (!qtyInput.value || qtyInput.value <= 0) {
+          alert("Mohon masukkan jumlah pesanan yang valid.");
+          return;
+        }
+
+        const selectedOption = select.options[select.selectedIndex];
+        const name = selectedOption.value;
+        const price = parseInt(selectedOption.getAttribute("data-price"));
+        const unit = selectedOption.getAttribute("data-unit");
+        const estimate = selectedOption.getAttribute("data-estimate");
+        const qty = parseInt(qtyInput.value);
+
+        addToCart(name, price, unit, estimate, qty);
+      }
+
+      function updatePlaceholder() {
+        const select = document.getElementById("serviceSelect");
+        const qtyInput = document.getElementById("serviceQty");
+        if (!select || !qtyInput) return;
+
+        const selectedOption = select.options[select.selectedIndex];
+        if (selectedOption) {
+          const unit = selectedOption.getAttribute("data-unit") || "kg";
+          qtyInput.placeholder = `Masukkan jumlah dalam ${unit}`;
+          qtyInput.value = "";
+        }
+      }
+    </script>
+  </body>
+</html>

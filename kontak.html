@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kontak - CleanWash Laundry</title>
+  <title>Hubungi Kami - CleanWash Laundry</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -42,8 +42,8 @@
 }
 
 .contact-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  display: flex;
+  justify-content: center;
   gap: 30px;
 }
 
@@ -85,13 +85,14 @@
   <header>
     <nav class="nav">
       <div class="logo"><span class="gradient-text">CleanWash</span></div>
-      <ul class="nav-links">
-        <li><a href="index.html">Beranda</a></li>
-        <li><a href="tentang_kami.html">Tentang Kami</a></li>
-        <li><a href="harga.html">Harga</a></li>
-        <li><a href="galeri.html">Galeri</a></li>
-        <li><a href="kontak.html">Kontak</a></li>
-      </ul>
+        <ul class="nav-links">
+          <li><a href="index.html">Beranda</a></li>
+          <li><a href="tentang_kami.html">Tentang Kami</a></li>
+          <li><a href="harga.html">Daftar Harga</a></li>
+          <li><a href="keranjang.html">Pemesanan</a></li>
+          <li><a href="galeri.html">Galeri</a></li>
+          <li><a href="kontak.html">Hubungi Kami</a></li>
+        </ul>
     </nav>
   </header>
 
@@ -130,40 +131,6 @@
             <p>Minggu : 09.00 - 17.00 WIB</p>
           </div>
         </div>
-
-        <!-- Form Kontak -->
-        <div class="contact-form-box">
-          <h3>Form Pemesanan / Pesan</h3>
-          <form class="contact-form">
-            <div class="form-group">
-              <label for="nama">Nama Lengkap</label>
-              <input type="text" id="nama" name="nama" placeholder="Masukkan nama lengkap" />
-            </div>
-
-            <div class="form-group">
-              <label for="telepon">Nomor HP</label>
-              <input type="text" id="telepon" name="telepon" placeholder="Masukkan nomor HP" />
-            </div>
-
-            <div class="form-group">
-              <label for="layanan">Jenis Layanan</label>
-              <select id="layanan" name="layanan">
-                <option value="">-- Pilih Layanan --</option>
-                <option value="laundry-kiloan">Laundry Kiloan</option>
-                <option value="laundry-satuan">Laundry Satuan</option>
-                <option value="cuci-setrika">Cuci + Setrika</option>
-                <option value="setrika-saja">Setrika Saja</option>
-                <option value="express">Express Laundry</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="pesan">Pesan</label>
-              <textarea id="pesan" name="pesan" rows="5" placeholder="Tulis pesan Anda"></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Kirim Pesan</button>
-          </form>
         </div>
       </div>
     </div>
