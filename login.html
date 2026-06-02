@@ -170,27 +170,34 @@
 
 <script src="app.js"></script>
 <script>
-    document.getElementById('formLogin').addEventListener('submit', function (event) {
-        // Mencegah halaman refresh otomatis saat tombol diklik
-        event.preventDefault();
+    document.getElementById('formLogin').addEventListener('submit', function(event) {
+    event.preventDefault(); 
 
-        // Ambil data yang diketik user
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
+    // 1. Ambil input dari form
+    const usernameInput = document.getElementById('loginEmail').value; 
+    const passwordInput = document.getElementById('loginPassword').value;
 
-        // Tentukan email dan password tiruan untuk uji coba login
-        const emailBenar = "kelompok3";
-        const passwordBenar = "123456";
+    // 2. Data akun bawaan tim (Default Admin)
+    const defaultUser = "admin";
+    const defaultPass = "123456";
 
-        // Cek apakah yang diketik user sudah cocok
-        if (email === emailBenar && password === passwordBenar) {
-            alert("Login Berhasil! Selamat datang di CleanWash.");
-            // Pindahkan user ke halaman yang dituju (misal: keranjang.html atau index.html)
-            window.location.href = "index.html";
-        } else {
-            alert("Login Gagal! Email atau password salah. Silakan coba lagi.");
-        }
-    });
+    // 3. Ambil data dari hasil register
+    const registeredUser = localStorage.getItem('storedUsername');
+    const registeredPass = localStorage.getItem('storedPassword');
+
+    // 4. Cek Logika
+    if (usernameInput === defaultUser && passwordInput === defaultPass) {
+        alert("Login Berhasil! Selamat datang Admin CleanWash.");
+        window.location.href = "index.html"; 
+    } 
+    else if (registeredUser && usernameInput === registeredUser && passwordInput === registeredPass) {
+        alert("Login Berhasil! Selamat datang @" + registeredUser + " di CleanWash.");
+        window.location.href = "index.html"; 
+    } 
+    else {
+        alert("Login Gagal! Username atau kata sandi salah.");
+    }
+});
 </script>
 
 

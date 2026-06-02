@@ -123,7 +123,7 @@
                 </div>
                 <div class="card-body p-4 p-md-5">
 
-                    <form action="#" method="POST">
+                    <form action="#" id="formRegister" method="POST">
                         <!-- Input Nama Lengkap -->
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="regName" placeholder="Nama Lengkap" required>
@@ -185,5 +185,27 @@
 </body>
 
 <script src="app.js"></script>
+<script>
+    document.getElementById('formRegister').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const username = document.getElementById('regName').value;
+        const password = document.getElementById('regPassword').value;
+        const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+
+        // VALIDASI: Cek apakah password dan konfirmasi password sama
+        if (password !== passwordConfirm) {
+            alert("Pendaftaran Gagal! Kata sandi dan konfirmasi kata sandi tidak cocok.");
+            return; // Menghentikan proses pendaftaran
+        }
+
+        // Simpan ke storage browser jika password sudah cocok
+        localStorage.setItem('storedUsername', username);
+        localStorage.setItem('storedPassword', password);
+
+        alert("Pendaftaran Berhasil!\nAkun Anda telah disimpan. Silakan masuk.");
+        window.location.href = "login.html";
+    });
+</script>
 
 </html>
