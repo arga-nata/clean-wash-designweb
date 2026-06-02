@@ -1,31 +1,37 @@
 const dummyOrder = [
   {
     id: "001",
-    layanan: "Cuci Kering",
-    berat: "5kg",
+    items: [
+      { name: "Cuci Kering", qty: "5kg" },
+      { name: "Cuci Karpet", qty: "1lm" },
+    ],
     status: "Selesai",
-    total: "Rp 50.000",
+    total: "Rp 100.000",
   },
   {
     id: "002",
-    layanan: "Cuci Setrika",
-    berat: "3kg",
+    items: [{ name: "Cuci Setrika", qty: "3kg" }],
     status: "Proses",
     total: "Rp 30.000",
   },
   {
     id: "003",
-    layanan: "Cuci Karpet",
-    berat: "10kg",
+    items: [
+      { name: "Cuci Bedcover", qty: "1pcs" },
+      { name: "Cuci Selimut", qty: "1pcs" },
+      { name: "Cuci Sprei", qty: "2pcs" },
+    ],
     status: "Pending",
-    total: "Rp 100.000",
+    total: "Rp 150.000",
   },
   {
     id: "004",
-    layanan: "Setrika Saja",
-    berat: "4kg",
+    items: [
+      { name: "Setrika Saja", qty: "4kg" },
+      { name: "Cuci Kering", qty: "2kg" },
+    ],
     status: "Selesai",
-    total: "Rp 20.000",
+    total: "Rp 70.000",
   },
 ];
 
@@ -41,6 +47,19 @@ function renderOrders() {
   orderList.innerHTML = "";
 
   dummyOrder.forEach((order) => {
+    const displayItems = order.items
+      .slice(0, 2)
+      .map((item) => item.name)
+      .join(", ");
+    const sisaItem = order.items.length - 2;
+    const semuaLayanan =
+      sisaItem > 0
+        ? `${displayItems}... (+${sisaItem} item lainnya)`
+        : displayItems;
+    const totalBerat = order.items.reduce((sum, item) => {
+      return sum + parseInt(item.qty);
+    }, 0);
+
     const cardHTML = `
         <div class="col">
           <div class="card h-100">
@@ -48,11 +67,11 @@ function renderOrders() {
             <div class="card-body text-start">
               <div class="d-flex justify-content-between mb-2">
                 <h5 class="card-title">Pesanan #${order.id}</h5>
-                <h1 class="badge p-2 ${getStatusClass(order.status)}">${order.status}</h1>
+                <h1 class="badge p-2 w-50 ${getStatusClass(order.status)}">${order.status}</h1>
               </div>
-              <p class="card-text"><strong>Layanan:</strong> ${order.layanan}</p>
-              <p class="card-text"><strong>Berat:</strong> ${order.berat}</p>
-              <p class="card-text"><strong>Total:</strong> ${order.total}</p>
+                <p class="card-text"><strong>Layanan:</strong> ${semuaLayanan}</p>
+                <p class="card-text"><strong>Total Berat:</strong> ${totalBerat} kg</p>
+                <p class="card-text"><strong>Total:</strong> ${order.total}</p>
             </div>
             <div class="card-footer">
               <button class="btn btn-primary w-100 p-2">Detail Pesanan</button>
