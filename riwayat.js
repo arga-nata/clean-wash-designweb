@@ -75,8 +75,11 @@ function renderOrders() {
                 <p class="card-text"><strong>Total Berat:</strong> ${totalBerat} kg</p>
                 <p class="card-text"><strong>Total:</strong> ${order.total}</p>
             </div>
-            <div class="card-footer">
-            <a href="detail-order.html?id=${order.id}" class="btn btn-primary w-100 p-2">Detail Pesanan</a>
+            <div class="card-footer border-top-0 pb-4">
+            <div class="d-grid gap-2">
+                <a href="detail-order.html?id=${order.id}" class="btn btn-primary p-2">Detail Pesanan</a>
+                <button onclick="hapusPesanan(${order.id})" class="btn btn-danger p-2">Hapus Pesanan</button>
+              </div>
             </div>
           </div>
         </div>
@@ -85,5 +88,17 @@ function renderOrders() {
     orderList.innerHTML += cardHTML;
   });
 }
+
+window.hapusPesanan = function (orderId) {
+  if (confirm("Apakah Anda yakin ingin menghapus pesanan ini?")) {
+    let semuaPesanan =
+      JSON.parse(localStorage.getItem("cleanwash_orders")) || [];
+    const pesananTerfilter = semuaPesanan.filter(
+      (order) => order.id !== orderId,
+    );
+    localStorage.setItem("cleanwash_orders", JSON.stringify(pesananTerfilter));
+    location.reload();
+  }
+};
 
 setTimeout(renderOrders, 500);

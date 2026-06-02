@@ -1,8 +1,18 @@
-// fungsi untuk menambahkan class active pada link yang sesuai dengan halaman saat ini
-const links = document.querySelectorAll(".nav-links a");
-
 // ambil nama file aktif
 let currentPage = window.location.pathname.split("/").pop();
+
+const protectedPages = ["keranjang.html", "riwayat-order.html"]; // Daftar halaman yang harus login
+
+if (protectedPages.includes(currentPage)) {
+  const isLoggedIn = localStorage.getItem("isLoggedIn");
+  if (isLoggedIn !== "true") {
+    alert("Silakan login terlebih dahulu untuk mengakses halaman ini.");
+    window.location.href = "login.html";
+  }
+}
+
+// fungsi untuk menambahkan class active pada link yang sesuai dengan halaman saat ini
+const links = document.querySelectorAll(".nav-links a");
 
 // kalau index (kadang kosong)
 if (currentPage === "") {
@@ -131,8 +141,7 @@ window.updateCartUI = function () {
     });
   }
 
-  if (totalElement)
-    totalElement.innerText = `Rp ${total.toLocaleString("id-ID")}`;
+  calculateTotal();
   if (estimateElement) {
     const estText = maxDays === 0 ? "0 Hari" : `${maxDays} Hari`;
     estimateElement.innerText = estText;
@@ -181,6 +190,49 @@ window.validateForm = function () {
   whatsappBtn.disabled = !isFormValid;
 };
 
+window.calculateTotal = function () {
+  let subtotal = 0;
+  cart.forEach((item) => {
+    subtotal += item.price * item.qty;
+  });
+
+  const deliveryMethod =
+    document.querySelector('input[name="deliveryMethod"]:checked')?.value ||
+    "Ambil Sendiri";
+  const locationArea = document.getElementById("locationArea")?.value;
+  let deliveryFee = 0;
+
+  if (deliveryMethod === "Kurir Jemput") {
+    if (locationArea === "kota") {
+      deliveryFee = 5000;
+    } else if (locationArea === "kabupaten") {
+      deliveryFee = 10000;
+    } else {
+      deliveryFee = 20000;
+    }
+  }
+
+  const finalTotal = subtotal + deliveryFee;
+
+  const subtotalEl = document.getElementById("subtotalAmount");
+  const deliveryEl = document.getElementById("deliveryFeeAmount");
+  const totalEl = document.getElementById("totalAmount");
+
+  if (subtotalEl)
+    subtotalEl.innerText = `Rp ${subtotal.toLocaleString("id-ID")}`;
+  if (deliveryEl)
+    deliveryEl.innerText = `Rp ${deliveryFee.toLocaleString("id-ID")}`;
+  if (totalEl) totalEl.innerText = `Rp ${finalTotal.toLocaleString("id-ID")}`;
+
+  return { finalTotal, deliveryFee, deliveryMethod };
+};
+
+document.addEventListener("input", (e) => {
+  if (e.target.id === "custAddress") {
+    calculateTotal();
+  }
+});
+
 window.kirimWhatsApp = function () {
   const name = document.getElementById("custName").value;
   const phone = document.getElementById("custPhone").value;
@@ -189,7 +241,8 @@ window.kirimWhatsApp = function () {
   cart.forEach((item) => {
     totalHargaKalkulator += item.price * item.qty;
   });
-  const total = `Rp ${totalHargaKalkulator.toLocaleString("id-ID")}`;
+  const { finalTotal, deliveryFee, deliveryMethod } = calculateTotal();
+  const total = `Rp ${finalTotal.toLocaleString("id-ID")}`;
   const estimate = document.getElementById("totalEstimate").innerText;
 
   let orderDetails = "";

@@ -36,6 +36,20 @@ if (currentOrder) {
     progressLabel.innerText = "Selesai";
   }
 
+  const btnNext = document.getElementById("btn-next-status");
+
+  if (currentOrder.status === "Pending") {
+    btnNext.innerText = "Maju ke Proses";
+    btnNext.onclick = () => updateStatus("Proses");
+  } else if (currentOrder.status === "Proses") {
+    btnNext.innerText = "Selesaikan Pesanan";
+    btnNext.onclick = () => updateStatus("Selesai");
+  } else {
+    btnNext.innerText = "Pesanan Telah Selesai";
+    btnNext.disabled = true;
+    btnNext.className = "btn btn-secondary";
+  }
+
   let maxDays = 0;
   currentOrder.items.forEach((item) => {
     const days = parseInt(item.estimate) || 0;
@@ -69,3 +83,17 @@ if (currentOrder) {
   alert("Pesanan tidak ditemukan!");
   window.location.href = "riwayat-order.html";
 }
+
+window.updateStatus = function (newStatus) {
+  let allOrders = JSON.parse(localStorage.getItem("cleanwash_orders")) || [];
+
+  const updatedOrders = allOrders.map((order) => {
+    if (order.id == orderId) {
+      return { ...order, status: newStatus };
+    }
+    return order;
+  });
+
+  localStorage.setItem("cleanwash_orders", JSON.stringify(updatedOrders));
+  location.reload();
+};

@@ -6,7 +6,36 @@
     <title>Riwayat Pesanan - CleanWash Laundry</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <style>
+      header .nav-links {
+        display: flex !important;
+        /* Memaksa menu tetap berjejer ke samping */
+        list-style: none !important;
+        /* Menghilangkan bullet/titik jika muncul */
+        padding-left: 0 !important;
+        /* Menghapus padding-left bawaan dari Bootstrap <ul> */
+        margin-bottom: 0 !important;
+        /* Menghapus margin-bottom bawaan dari Bootstrap <ul> */
+      }
+
+      header .nav-links li {
+        margin: 0 !important;
+        /* Memastikan margin antar list diatur oleh CSS lamamu */
+        padding: 0 !important;
+      }
+
+      header .nav-links a {
+        text-decoration: none !important;
+        /* Menghilangkan garis bawah default browser/Bootstrap */
+        display: inline-block !important;
+        /* Menjaga ukuran tombol sesuai CSS lamamu */
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -22,14 +51,14 @@
           <li><a href="keranjang.html">Pemesanan</a></li>
           <li><a href="galeri.html">Galeri</a></li>
           <li>
-            <a href="riwayat-order.html" class="active">Riwayat Pesanan</a>
+            <a href="riwayat-order.html" class="active">Riwayat</a>
           </li>
           <li><a href="kontak.html">Hubungi Kami</a></li>
-          <li><a href="login.html" class="btn-nav-login">Masuk / Daftar</a></li>
+          <li><a href="login.html">Masuk / Daftar</a></li>
         </ul>
       </nav>
     </header>
-    <div class="container py-5">
+    <div class="container py-5" style="margin-top: 60px">
       <div class="row justify-content-center">
         <div class="col-md-8">
           <div class="mb-4">
@@ -103,9 +132,9 @@
           </div>
 
           <div class="mt-5">
-            <a href="riwayat-order.html" class="btn btn-secondary"
-              >Kembali ke Riwayat</a
-            >
+            <button id="btn-next-status" class="btn btn-success">
+              Lanjutkan Proses
+            </button>
           </div>
         </div>
       </div>
