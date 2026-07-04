@@ -4,284 +4,174 @@ let currentPage = window.location.pathname.split("/").pop();
 const protectedPages = ["keranjang.html", "riwayat-order.html"]; // Daftar halaman yang harus login
 
 if (protectedPages.includes(currentPage)) {
-  const isLoggedIn = localStorage.getItem("isLoggedIn");
-  if (isLoggedIn !== "true") {
-    alert("Silakan login terlebih dahulu untuk mengakses halaman ini.");
+  const customerId = localStorage.getItem("customer_id");
+  if (!customerId) {
     window.location.href = "login.html";
   }
 }
 
-// fungsi untuk menambahkan class active pada link yang sesuai dengan halaman saat ini
-const links = document.querySelectorAll(".nav-links a");
-
-// kalau index (kadang kosong)
-if (currentPage === "") {
-  currentPage = "index.html";
-}
-
-links.forEach((link) => {
-  let linkPage = link.getAttribute("href");
-
-  if (linkPage === currentPage) {
-    link.classList.add("active");
-  }
-});
-
-// fungsi scroll ke layanan
-function scrollLayanan() {
-  document.getElementById("layanan").scrollIntoView({
-    behavior: "smooth",
-  });
-}
-
-// fungsi scroll ke layanan dengan animasi munculnya card
-const cards = document.querySelectorAll(".service-card");
-
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry, index) => {
-      if (entry.isIntersecting) {
-        // animasi delay biar muncul satu-satu
-        setTimeout(() => {
-          entry.target.classList.add("show");
-        }, index * 300);
-      }
-    });
-  },
-  {
-    threshold: 0.3,
-  },
-);
-
-cards.forEach((card) => {
-  observer.observe(card);
-});
-
-const galleryCards = document.querySelectorAll(".gallery-card");
-
-const galleryObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("show");
-      }
-    });
-  },
-  {
-    threshold: 0.2,
-  },
-);
-
-galleryCards.forEach((card, index) => {
-  card.style.transitionDelay = `${index * 0.5}s`;
-  galleryObserver.observe(card);
-});
-
-// FITUR KERANJANG PEMESANAN
-
+// --- LOGIKA KERANJANG (CART) ---
 let cart = JSON.parse(localStorage.getItem("cleanwash_cart")) || [];
 
-window.updateCartUI = function () {
-  const cartList = document.getElementById("cartList");
-  const totalElement = document.getElementById("totalAmount");
-  const estimateElement = document.getElementById("totalEstimate");
+function updateCartUI() {
+  const cartItemsContainer = document.getElementById("cart-items");
+  if (!cartItemsContainer) return;
 
-  if (!cartList) return;
-
-  cartList.innerHTML = "";
-  let total = 0;
-  let maxDays = 0;
+  cartItemsContainer.innerHTML = "";
 
   if (cart.length === 0) {
-    cartList.innerHTML = `<p style="text-align:center; color:#666; padding:20px;">Keranjang masih kosong.</p>`;
+    cartItemsContainer.innerHTML = `<div class="empty-cart">Keranjang Anda kosong.</div>`;
   } else {
     cart.forEach((item, index) => {
-      const subtotal = item.price * item.qty;
-      total += subtotal;
-
-      const dayMatch = item.estimate.match(/(\d+)/);
-      const days = dayMatch ? parseInt(dayMatch[1]) : 0;
-      if (days > maxDays) maxDays = days;
-
-      const itemRow = document.createElement("div");
-      itemRow.className = "cart-item";
-      itemRow.innerHTML = `
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "cart-item";
+      itemDiv.innerHTML = `
         <div class="item-info">
           <span class="item-name">${item.name}</span>
-          <span class="item-qty">${item.qty} ${item.unit} x Rp ${item.price.toLocaleString("id-ID")} (${item.estimate})</span>
+          <span class="item-qty">Jumlah: ${item.qty} ${item.unit}</span>
         </div>
-        <div class="item-right">
-          <span class="item-price">Rp ${subtotal.toLocaleString("id-ID")}</span>
-          <button class="btn-del" onclick="removeFromCart(${index})">&times;</button>
+        <div class="item-price">
+          <span>Rp ${(item.price * item.qty).toLocaleString("id-ID")}</span>
+          <button class="remove-btn" onclick="removeFromCart(${index})">Hapus</button>
         </div>
       `;
-      cartList.appendChild(itemRow);
+      cartItemsContainer.appendChild(itemDiv);
     });
   }
-
   calculateTotal();
-  if (estimateElement) {
-    const estText = maxDays === 0 ? "0 Hari" : `${maxDays} Hari`;
-    estimateElement.innerText = estText;
-  }
+}
 
-  validateForm();
-};
-
-window.addToCart = function (name, price, unit, estimate, qty) {
-  if (qty <= 0 || isNaN(qty)) {
-    alert("Mohon masukkan jumlah pesanan yang valid.");
+function addToCart(name, price, unit) {
+  const existingItem = cart.find((item) => item.name === name);
+  if (existingItem) {
+    existingItem.qty += 1;
   } else {
-    const existingIndex = cart.findIndex((item) => item.name === name);
-    if (existingIndex !== -1) {
-      cart[existingIndex].qty += qty;
-    } else {
-      cart.push({ name, price, unit, estimate, qty });
-    }
-
-    localStorage.setItem("cleanwash_cart", JSON.stringify(cart));
-    updateCartUI();
+    cart.push({ name, price, qty: 1, unit });
   }
-};
-
-window.removeFromCart = function (index) {
-  cart.splice(index, 1);
-  localStorage.setItem("cleanwash_cart", JSON.stringify(cart));
+  saveCart();
   updateCartUI();
-};
+}
 
-window.validateForm = function () {
-  const name = document.getElementById("custName");
-  const phone = document.getElementById("custPhone");
-  const address = document.getElementById("custAddress");
-  const whatsappBtn = document.getElementById("btnWhatsApp");
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  saveCart();
+  updateCartUI();
+}
 
-  if (!name || !phone || !address || !whatsappBtn) return;
+function saveCart() {
+  localStorage.setItem("cleanwash_cart", JSON.stringify(cart));
+}
 
-  const isFormValid =
-    name.value.trim() !== "" &&
-    phone.value.trim() !== "" &&
-    address.value.trim() !== "" &&
-    cart.length > 0;
+function calculateTotal() {
+  const totalElement = document.getElementById("total-amount");
+  const deliveryElement = document.getElementById("delivery-fee");
+  const hiddenTotal = document.getElementById("hiddenTotalAmount");
+  const hiddenDelivery = document.getElementById("hiddenDeliveryFee");
+  const areaSelect = document.getElementById("area-pickup");
+  const methodSelect = document.getElementsByName("pickup-method");
 
-  whatsappBtn.disabled = !isFormValid;
-};
+  if (!totalElement) return;
 
-window.calculateTotal = function () {
-  let subtotal = 0;
-  cart.forEach((item) => {
-    subtotal += item.price * item.qty;
-  });
-
-  const deliveryMethod =
-    document.querySelector('input[name="deliveryMethod"]:checked')?.value ||
-    "Ambil Sendiri";
-  const locationArea = document.getElementById("locationArea")?.value;
+  let subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   let deliveryFee = 0;
 
-  if (deliveryMethod === "Kurir Jemput") {
-    if (locationArea === "kota") {
-      deliveryFee = 5000;
-    } else if (locationArea === "kabupaten") {
-      deliveryFee = 10000;
-    } else {
-      deliveryFee = 20000;
+  if (methodSelect && methodSelect.length > 0) {
+    const selectedMethod = Array.from(methodSelect).find(
+      (r) => r.checked,
+    )?.value;
+    if (selectedMethod === "kurir") {
+      if (areaSelect) {
+        const area = areaSelect.value;
+        if (area === "kota") deliveryFee = 5000;
+        else if (area === "kabupaten") deliveryFee = 15000;
+        else if (area === "luar_kota") deliveryFee = 25000;
+      }
     }
   }
 
-  const finalTotal = subtotal + deliveryFee;
+  const total = subtotal + deliveryFee;
 
-  const subtotalEl = document.getElementById("subtotalAmount");
-  const deliveryEl = document.getElementById("deliveryFeeAmount");
-  const totalEl = document.getElementById("totalAmount");
-
-  if (subtotalEl)
-    subtotalEl.innerText = `Rp ${subtotal.toLocaleString("id-ID")}`;
-  if (deliveryEl)
-    deliveryEl.innerText = `Rp ${deliveryFee.toLocaleString("id-ID")}`;
-  if (totalEl) totalEl.innerText = `Rp ${finalTotal.toLocaleString("id-ID")}`;
-
-  // FIX: Update input hidden agar data terkirim ke database
-  const hiddenTotal = document.getElementById("hiddenTotalAmount");
-  const hiddenFee = document.getElementById("hiddenDeliveryFee");
-  if (hiddenTotal) hiddenTotal.value = finalTotal;
-  if (hiddenFee) hiddenFee.value = deliveryFee;
-
-  return { finalTotal, deliveryFee, deliveryMethod };
-};
-
-document.addEventListener("input", (e) => {
-  if (e.target.id === "custAddress") {
-    calculateTotal();
+  totalElement.innerText = `Rp ${total.toLocaleString("id-ID")}`;
+  if (deliveryElement) {
+    deliveryElement.innerText = `Rp ${deliveryFee.toLocaleString("id-ID")}`;
   }
+  if (hiddenTotal) {
+    hiddenTotal.value = total;
+  }
+  if (hiddenDelivery) {
+    hiddenDelivery.value = deliveryFee;
+  }
+}
+
+// --- LOGIKA FORM PESANAN (KERANJANG) ---
+const orderForm = document.getElementById("order-form");
+if (orderForm) {
+  orderForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(orderForm);
+    const submitBtn = orderForm.querySelector("button[type='submit']");
+    const originalBtnText = submitBtn.innerText;
+
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Memproses...";
+
+    try {
+      const response = await fetch("keranjang.php", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+
+      if (result.status === "success") {
+        submitBtn.style.backgroundColor = "#22c55e";
+        submitBtn.innerText = "Berhasil!";
+        localStorage.removeItem("cleanwash_cart");
+        setTimeout(() => {
+          window.location.href = "riwayat-order.php";
+        }, 1500);
+      } else {
+        alert(result.message || "Terjadi kesalahan saat membuat pesanan.");
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalBtnText;
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Terjadi kesalahan jaringan. Silakan coba lagi.");
+      submitBtn.disabled = false;
+      submitBtn.innerText = originalBtnText;
+    }
+  });
+}
+
+// --- LOGIKA FORM KONTAK (WHATSAPP) ---
+const whatsappForm = document.getElementById("whatsapp-contact-form");
+if (whatsappForm) {
+  whatsappForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("contact-name").value;
+    const email = document.getElementById("contact-email").value;
+    const rawMessage = document.getElementById("contact-message").value;
+    const message = rawMessage
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+
+    // Format pesan untuk WhatsApp
+    const waText = `Halo CleanWash Laundry, saya ingin bertanya:\n\n*Nama:* ${name}\n*Email:* ${email}\n*Pesan:* ${message}`;
+    const encodedText = encodeURIComponent(waText);
+    const phoneNumber = "6281234567890"; // Ganti dengan nomor WA admin
+
+    window.open(`https://wa.me/${phoneNumber}?text=${encodedText}`, "_blank");
+  });
+}
+
+// Listener untuk update total secara real-time
+document.addEventListener("input", () => {
+  calculateTotal();
 });
 
-window.kirimWhatsApp = function () {
-  const name = document.getElementById("custName").value;
-  const phone = document.getElementById("custPhone").value;
-  const address = document.getElementById("custAddress").value;
-  let totalHargaKalkulator = 0;
-  cart.forEach((item) => {
-    totalHargaKalkulator += item.price * item.qty;
-  });
-  const { finalTotal, deliveryFee, deliveryMethod } = calculateTotal();
-  const total = `Rp ${finalTotal.toLocaleString("id-ID")}`;
-  const estimate = document.getElementById("totalEstimate").innerText;
-
-  let orderDetails = "";
-  cart.forEach((item, index) => {
-    const subtotal = item.price * item.qty;
-    orderDetails += `${index + 1}. ${item.name} (${item.qty} ${item.unit}) - Rp ${subtotal.toLocaleString("id-ID")}\n`;
-  });
-
-  const message =
-    `Halo CleanWash Laundry, java saya ingin melakukan pemesanan layanan laundry.\n\n` +
-    `*Data Pelanggan:*\n` +
-    `Nama: ${name}\n` +
-    `No. HP: ${phone}\n` +
-    `Alamat: ${address}\n\n` +
-    `*Rincian Pesanan:*\n${orderDetails}\n` +
-    `*Total Bayar:* ${total}\n` +
-    `*Estimasi Selesai:* ${estimate}\n\n` +
-    `Mohon konfirmasinya, terima kasih.`;
-
-  const encodedMsg = encodeURIComponent(message);
-  const semuaPesanan =
-    JSON.parse(localStorage.getItem("cleanwash_orders")) || [];
-  semuaPesanan.push({
-    id: Math.floor(Math.random() * 1000),
-    customerName: name,
-    customerPhone: phone,
-    customerAddress: address,
-    items: cart,
-    status: "Pending",
-    total: total,
-    date: new Date().toLocaleDateString(),
-  });
-  localStorage.setItem("cleanwash_orders", JSON.stringify(semuaPesanan));
-  window.location.href = "riwayat-order.html";
-};
-
-document.addEventListener("input", (e) => {
-  if (e.target.matches("input, select, textarea")) {
-    validateForm();
-    calculateTotal();
-  }
-});
-
-window.onload = () => {
-  updateCartUI();
-};
-
-window.capitalizeInput = function (element) {
-  let cursorPosition = element.selectionStart;
-  let value = element.value;
-
-  let capitalized = value
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-
-  element.value = capitalized;
-  element.setSelectionRange(cursorPosition, cursorPosition);
-};
+// Inisialisasi awal
+updateCartUI();
