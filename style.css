@@ -5,11 +5,11 @@
 }
 
 header {
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   width: 100%;
-  background-color: rgba(73, 177, 200, 0.9);
+  background-color: rgba(73, 177, 200, 1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 1000;
 }
@@ -19,7 +19,7 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 0 5%;
-  height: 70px;
+  height: 90px;
   color: white;
 }
 
@@ -319,11 +319,6 @@ iconify-icon {
   max-width: 600px;
   border-radius: 20px;
   margin-bottom: 30px;
-  transition: 0.4s;
-}
-
-.about-img:hover {
-  transform: scale(1.05);
 }
 
 .about-container h1 {
@@ -384,14 +379,14 @@ footer {
   text-align: center;
 }
 
-/* .gradient-text {
+.gradient-text {
     background: linear-gradient(90deg, #ffffff, #00bcd4, #ffffff);
     background-size: 200%;
     -webkit-background-clip: text;
-    color: transparent;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
     animation: gradientMove 3s linear infinite;
-    
-  } */
+}
 
 @keyframes gradientMove {
   to {

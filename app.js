@@ -286,7 +286,9 @@ document.addEventListener("input", (e) => {
 });
 
 // Jalankan update UI saat pertama kali load
-updateCartUI();
+window.onload = () => {
+  updateCartUI();
+};
 
 window.capitalizeInput = function (element) {
   let cursorPosition = element.selectionStart;

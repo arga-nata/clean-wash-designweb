@@ -1,0 +1,4 @@
+/admin/
+.env
+config.php
+.ddev/
