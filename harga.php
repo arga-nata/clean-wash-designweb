@@ -3,7 +3,6 @@
 <style>
     .price-section {
         padding: 60px 20px;
-        background-color: #ffffff;
         flex: 1;
     }
 
