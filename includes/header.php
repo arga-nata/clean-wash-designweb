@@ -56,7 +56,7 @@ $cid = isset($_SESSION['customer_id']) ? $_SESSION['customer_id'] : (isset($_GET
                     <li><a href="galeri.php"
                             class="<?php echo ($current_page == 'galeri.php') ? 'active' : ''; ?>">Galeri</a></li>
                     <li><a href="riwayat-order.php?cid=<?php echo $cid; ?>"
-                            class="<?php echo ($current_page == 'riwayat-order.php') ? 'active' : ''; ?>">Riwayat</a>
+                            class="<?php echo ($current_page == 'riwayat-order.php' || $current_page == 'detail-order.php') ? 'active' : ''; ?>">Riwayat</a>
                     </li>
                     <li><a href="kontak.php"
                             class="<?php echo ($current_page == 'kontak.php') ? 'active' : ''; ?>">Hubungi Kami</a></li>

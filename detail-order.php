@@ -38,61 +38,11 @@ if ($status_clean == "pending") {
 } elseif ($status_clean == "selesai") {
   $progress_width = "100";
 }
+
+include 'includes/header.php';
 ?>
 
-<!doctype html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Detail Pesanan #<?php echo $order['id']; ?> - CleanWash Laundry</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css" />
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
-  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-  <style>
-    header .nav-links {
-      display: flex !important;
-      list-style: none !important;
-      padding-left: 0 !important;
-      margin-bottom: 0 !important;
-    }
-
-    header .nav-links li {
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-
-    header .nav-links a {
-      text-decoration: none !important;
-      display: inline-block !important;
-    }
-  </style>
-</head>
-
-<body>
-  <header>
-    <nav class="nav">
-      <div class="logo">
-        <span class="gradient-text">CleanWash</span>
-      </div>
-      <ul class="nav-links">
-        <li><a href="index.html">Beranda</a></li>
-        <li><a href="tentang_kami.html">Tentang Kami</a></li>
-        <li><a href="harga.html">Daftar Harga</a></li>
-        <li><a href="paket.html">Paket Langganan</a></li>
-        <li><a href="keranjang.php">Pemesanan</a></li>
-        <li><a href="galeri.html">Galeri</a></li>
-        <li>
-          <a href="riwayat-order.php" class="active">Riwayat</a>
-        </li>
-        <li><a href="kontak.html">Hubungi Kami</a></li>
-        <li><a href="login.html">Masuk / Daftar</a></li>
-      </ul>
-    </nav>
-  </header>
-  <div class="container py-5" style="margin-top: 60px">
+<div class="container py-5" style="margin-top: 60px">
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="mb-4">
@@ -184,18 +134,6 @@ if ($status_clean == "pending") {
 
       </div>
     </div>
-  </div>
+</div>
 
-  <script src="js/bootstrap.bundle.min.js"></script>
-  </div>
-  <footer>
-    <div class="footer-content">
-      <div class="footer-logo">CleanWash</div>
-      <p class="footer-copy">
-        &copy; 2026 CleanWash Laundry. All Rights Reserved.
-      </p>
-    </div>
-  </footer>
-</body>
-
-</html>
+<?php include 'includes/footer.php'; ?>

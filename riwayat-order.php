@@ -60,7 +60,7 @@ $result = mysqli_query($conn, $query);
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 style="margin: 0; font-weight: 700;">Pesanan #<?php echo $order['id']; ?></h5>
                 <span class="badge <?php echo $status_class; ?>"
-                  style="border-radius: 10px; font-size: 0.8rem;"><?php echo $order['status']; ?></span>
+                  style="border-radius: 10px; font-size: 0.8rem;padding-block: 10px; padding-inline: 30px;"><?php echo $order['status']; ?></span>
               </div>
               <p style="font-size: 0.9rem; color: #555; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
                 title="<?php echo $semua_layanan; ?>">
