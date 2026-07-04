@@ -48,7 +48,8 @@ $cid = isset($_SESSION['customer_id']) ? $_SESSION['customer_id'] : (isset($_GET
                             Kami</a></li>
                     <li><a href="harga.php"
                             class="<?php echo ($current_page == 'harga.php') ? 'active' : ''; ?>">Harga</a></li>
-                    <li><a href="paket.php" class="<?php echo ($current_page == 'paket.php') ? 'active' : ''; ?>">Paket
+                    <li><a href="paket.html"
+                            class="<?php echo ($current_page == 'paket.html') ? 'active' : ''; ?>">Paket
                             Langganan</a></li>
                     <li><a href="keranjang.php"
                             class="<?php echo ($current_page == 'keranjang.php') ? 'active' : ''; ?>">Pemesanan</a></li>

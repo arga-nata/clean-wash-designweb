@@ -34,7 +34,6 @@
     <div class="services-grid">
       <div class="service-card">
         <div class="card-icon">
-          <iconify-icon icon="bi:basket3-fill"></iconify-icon>
         </div>
         <h3>Laundry Kiloan</h3>
         <p>
@@ -43,7 +42,6 @@
         </p>
       </div>
       <div class="service-card">
-        <iconify-icon icon="lucide-lab:jacket"></iconify-icon>
         <h3>Laundry Satuan</h3>
         <p>
           Layanan satuan digunakan untuk item tertentu seperti jas, jaket, selimut, bed cover, dan pakaian khusus
@@ -51,9 +49,6 @@
         </p>
       </div>
       <div class="service-card">
-        <iconify-icon icon="bxs:washer"></iconify-icon>
-        <iconify-icon icon="line-md:plus"></iconify-icon>
-        <iconify-icon icon="material-symbols:iron-rounded"></iconify-icon>
         <h3>Cuci + Setrika</h3>
         <p>
           Pakaian akan dicuci hingga bersih, kemudian disetrika dengan rapi
@@ -61,7 +56,6 @@
         </p>
       </div>
       <div class="service-card">
-        <iconify-icon icon="material-symbols:iron-rounded"></iconify-icon>
         <h3>Setrika Saja</h3>
         <p>
           Layanan ini ditujukan bagi pelanggan yang telah mencuci pakaian sendiri, tetapi membutuhkan bantuan untuk
@@ -69,7 +63,6 @@
         </p>
       </div>
       <div class="service-card">
-        <iconify-icon icon="material-symbols:laundry"></iconify-icon>
         <h3>Express Laundry</h3>
         <p>
           Layanan cepat untuk pelanggan yang membutuhkan hasil laundry dalam waktu singkat, sangat cocok untuk
@@ -78,7 +71,6 @@
         </p>
       </div>
       <div class="service-card">
-        <iconify-icon icon="bxs:blanket"></iconify-icon>
         <h3>Cuci Selimut dan Bed Cover</h3>
         <p>
           Kami juga melayani pencucian perlengkapan rumah tangga seperti
