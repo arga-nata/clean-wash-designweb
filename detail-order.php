@@ -27,15 +27,16 @@ if (!$order) {
 }
 
 $status = $order['status'];
-$progress_width = "0%";
+$status_clean = trim(strtolower($status));
+$progress_width = "0";
 $progress_label = $status;
 
-if ($status == "Pending") {
-  $progress_width = "20%";
-} elseif ($status == "Proses") {
-  $progress_width = "60%";
-} elseif ($status == "Selesai") {
-  $progress_width = "100%";
+if ($status_clean == "pending") {
+  $progress_width = "33";
+} elseif ($status_clean == "proses") {
+  $progress_width = "66";
+} elseif ($status_clean == "selesai") {
+  $progress_width = "100";
 }
 ?>
 
@@ -95,11 +96,13 @@ if ($status == "Pending") {
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="mb-4">
-          <a href="riwayat-order.php?cid=<?php echo $order['customer_id']; ?>"
-            class="btn btn-outline-secondary btn-sm mb-3">
-            <i class="bi bi-arrow-left"></i> ← Kembali ke Riwayat
-          </a>
-          <h2 id="order-id-title">Detail Pesanan #<?php echo $order['id']; ?></h2>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 id="order-id-title" class="mb-0">Detail Pesanan #<?php echo $order['id']; ?></h2>
+            <a href="riwayat-order.php" class="btn btn-outline-secondary btn-sm"
+              style="border-radius: 10px; font-weight: 600;">
+              ← Kembali ke Riwayat
+            </a>
+          </div>
           <div class="d-flex justify-content-between align-items-center mb-2">
             <span id="order-date" class="text-muted">Tanggal:
               <?php echo date('d M Y', strtotime($order['order_date'])); ?></span>
@@ -141,7 +144,7 @@ if ($status == "Pending") {
           </div>
         </div>
 
-        <div class="card shadow-sm border-1">
+        <div class="card shadow-sm border">
           <div class="card-body p-0">
             <div class="p-3 border-bottom">
               <h5 class="fw-bold mb-0">Rincian Layanan:</h5>
@@ -159,13 +162,12 @@ if ($status == "Pending") {
                 <li class="list-group-item py-3">
                   <div class="fw-bold mb-1"><?php echo $item['service_name']; ?></div>
                   <div class="text-muted small mb-1">
-                    Jumlah: <?php echo intval($item['qty']) . ' ' . $item['unit']; ?> | Estimasi:
-                    <?php echo $item['estimate']; ?>
+                    Jumlah:
+                    <?php echo intval($item['qty']) . ' ' . $item['unit']; ?>
                   </div>
                   <div class="fw-bold text-primary" style="font-size: 0.9rem;">
                     Rp <?php echo number_format($subtotal, 0, ',', '.'); ?>
                   </div>
-                  <div class="text-muted" style="font-size: 0.7rem;">per unit</div>
                 </li>
               <?php endwhile; ?>
             </ul>

@@ -53,38 +53,39 @@ $result = mysqli_query($conn, $query);
           $status_class = "text-bg-warning";
         ?>
         <div style="width: 100%; max-width: 350px;">
-          <div class="card h-100"
-            style="background: white; border: 1px solid #eee; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: left;">
-            <img src="waduh.jpg" style="width: 100%; height: 200px; object-fit: cover;" alt="mesin-cuci">
+          <div class="card h-100 shadow-sm"
+            style="border-radius: 20px; overflow: hidden; text-align: left; border: 1px solid #eee;">
+            <img src="waduh.jpg" class="card-img-top" style="height: 200px; object-fit: cover;" alt="mesin-cuci">
             <div class="card-body" style="padding: 25px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 style="margin: 0; font-weight: 700;">Pesanan #<?php echo $order['id']; ?></h5>
                 <span class="badge <?php echo $status_class; ?>"
-                  style="padding: 5px 12px; border-radius: 10px; font-size: 0.8rem;"><?php echo $order['status']; ?></span>
+                  style="border-radius: 10px; font-size: 0.8rem;"><?php echo $order['status']; ?></span>
               </div>
-              <p style="font-size: 0.9rem; color: #555; margin-bottom: 8px;"><strong>Layanan:</strong>
-                <?php echo $semua_layanan; ?></p>
+              <p style="font-size: 0.9rem; color: #555; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                title="<?php echo $semua_layanan; ?>">
+                <strong>Layanan:</strong> <?php echo $semua_layanan; ?>
+              </p>
               <p style="font-size: 0.9rem; color: #555; margin-bottom: 20px;"><strong>Total:</strong> Rp
                 <?php echo number_format($order['total_amount'], 0, ',', '.'); ?>
               </p>
 
-              <div style="display: flex; gap: 10px;">
-                <a href="detail-order.php?id=<?php echo $order['id']; ?>"
-                  style="flex: 1; text-align: center; background: #49b1c8; color: white; text-decoration: none; padding: 10px; border-radius: 10px; font-size: 0.85rem; font-weight: 600;">Detail</a>
-                <button onclick="hapusPesanan(<?php echo $order['id']; ?>)"
-                  style="flex: 1; background: #ef4444; color: white; border: none; padding: 10px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">Hapus</button>
+              <div class="d-flex flex-column gap-2">
+                <a href="detail-order.php?id=<?php echo $order['id']; ?>" class="btn btn-info text-white flex-fill"
+                  style="border-radius: 10px; font-size: 0.85rem; font-weight: 600;">Detail</a>
+                <button onclick="hapusPesanan(<?php echo $order['id']; ?>)" class="btn btn-danger flex-fill"
+                  style="border-radius: 10px; font-size: 0.85rem; font-weight: 600;">Hapus</button>
               </div>
             </div>
           </div>
         </div>
       <?php endwhile; ?>
     <?php else: ?>
-      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 0;">
+      <div style="text-align: center; padding: 60px 0; width: 100%;">
         <div style="font-size: 60px; margin-bottom: 20px;">📦</div>
         <p style="color: #888; font-size: 1.1rem;">Anda belum memiliki riwayat pesanan.</p>
-        <a href="keranjang.php"
-          style="display: inline-block; margin-top: 10px; background: #49b1c8; color: white; text-decoration: none; padding: 12px 24px; border-radius: 20px; font-weight: 600;">Buat
-          Pesanan Sekarang</a>
+        <a href="keranjang.php" class="btn btn-info text-white"
+          style="border-radius: 20px; font-weight: 600; padding: 12px 24px;">Buat Pesanan Sekarang</a>
       </div>
     <?php endif; ?>
   </div>
