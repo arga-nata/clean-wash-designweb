@@ -12,8 +12,10 @@
         </p>
         <br />
 
-        <a onclick="scrollLayanan()" class="btn-solid">Lihat Layanan</a>
-        <a href="kontak.html" class="btn-outline">Hubungi Kami</a>
+        <div class="hero-btns">
+          <a href="keranjang.php" class="btn-solid">Pesan Sekarang</a>
+          <a href="kontak.php" class="btn-outline">Hubungi Kami</a>
+        </div>
       </div>
 
       <div class="banner_right">
