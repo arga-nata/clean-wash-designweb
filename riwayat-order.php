@@ -1,5 +1,6 @@
 <?php
-// --- BACKEND PHP ---
+session_start();
+
 $host = "db";
 $user = "db";
 $pass = "db";
@@ -10,153 +11,94 @@ if (!$conn) {
   die("Koneksi Database Gagal!");
 }
 
-// Ambil customer_id dari URL atau default ke 1
-$customer_id = isset($_GET['cid']) ? intval($_GET['cid']) : 1;
+if (!isset($_SESSION['customer_id'])) {
+  header("Location: login.php");
+  exit;
+}
+
+$customer_id = $_SESSION['customer_id'];
 $query = "SELECT * FROM tbl_orders WHERE customer_id = '$customer_id' ORDER BY id DESC";
 $result = mysqli_query($conn, $query);
 ?>
 
-<!doctype html>
-<html lang="en">
+<?php include 'includes/header.php'; ?>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Riwayat Pesanan - CleanWash Laundry</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css" />
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
-  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-  <style>
-    header .nav-links {
-      display: flex !important;
-      list-style: none !important;
-      padding-left: 0 !important;
-      margin-bottom: 0 !important;
-    }
+<section class="page-container" style="padding: 110px 10% 60px 10%; text-align: center;">
+  <h2 class="section-title">Riwayat Pesanan Saya</h2>
+  <p style="color: #666; margin-bottom: 40px;">
+    Kumpulan pesanan yang telah Anda lakukan di CleanWash.
+  </p>
 
-    header .nav-links li {
-      margin: 0 !important;
-      padding: 0 !important;
-    }
+  <div style="display: flex; flex-wrap: wrap; gap: 25px; justify-content: center;">
+    <?php if (mysqli_num_rows($result) > 0): ?>
+      <?php while ($order = mysqli_fetch_assoc($result)): ?>
+        <?php
+        $order_id = $order['id'];
+        $items_query = "SELECT s.service_name, i.qty FROM tbl_order_items i 
+                                  JOIN tbl_services s ON i.service_id = s.id 
+                                  WHERE i.order_id = '$order_id'";
+        $items_res = mysqli_query($conn, $items_query);
 
-    header .nav-links a {
-      text-decoration: none !important;
-      display: inline-block !important;
-    }
-  </style>
-</head>
+        $items_list = [];
+        while ($item = mysqli_fetch_assoc($items_res)) {
+          $qty = (int) $item['qty'];
+          $items_list[] = $item['service_name'] . " (" . $qty . ")";
+        }
+        $semua_layanan = implode(", ", $items_list);
 
-<body>
-  <div class="page">
-    <header>
-      <nav class="nav">
-        <div class="logo">
-          <span class="gradient-text">CleanWash</span>
-        </div>
-        <ul class="nav-links">
-          <li><a href="index.html">Beranda</a></li>
-          <li><a href="tentang_kami.html">Tentang Kami</a></li>
-          <li><a href="harga.html">Daftar Harga</a></li>
-          <li><a href="paket.html">Paket Langganan</a></li>
-          <li><a href="keranjang.php">Pemesanan</a></li>
-          <li><a href="galeri.html">Galeri</a></li>
-          <li>
-            <a href="riwayat-order.php" class="active">Riwayat</a>
-          </li>
-          <li><a href="kontak.html">Hubungi Kami</a></li>
-          <li><a href="login.html">Log In</a></li>
-        </ul>
-      </nav>
-    </header>
-    <div class="page-container">
-      <h2 class="text-center section-title">Riwayat Pesanan Saya</h2>
-      <p class="text-center mb-5">
-        Kumpulan pesanan yang telah Anda lakukan di CleanWash.
-      </p>
+        $status_class = "text-bg-danger";
+        if ($order['status'] === "Selesai")
+          $status_class = "text-bg-success";
+        elseif ($order['status'] === "Proses")
+          $status_class = "text-bg-warning";
+        ?>
+        <div style="width: 100%; max-width: 350px;">
+          <div class="card h-100"
+            style="background: white; border: 1px solid #eee; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: left;">
+            <img src="waduh.jpg" style="width: 100%; height: 200px; object-fit: cover;" alt="mesin-cuci">
+            <div class="card-body" style="padding: 25px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h5 style="margin: 0; font-weight: 700;">Pesanan #<?php echo $order['id']; ?></h5>
+                <span class="badge <?php echo $status_class; ?>"
+                  style="padding: 5px 12px; border-radius: 10px; font-size: 0.8rem;"><?php echo $order['status']; ?></span>
+              </div>
+              <p style="font-size: 0.9rem; color: #555; margin-bottom: 8px;"><strong>Layanan:</strong>
+                <?php echo $semua_layanan; ?></p>
+              <p style="font-size: 0.9rem; color: #555; margin-bottom: 20px;"><strong>Total:</strong> Rp
+                <?php echo number_format($order['total_amount'], 0, ',', '.'); ?>
+              </p>
 
-      <div id="order-list" class="row row-cols-1 row-cols-md-3 g-4">
-        <?php if (mysqli_num_rows($result) > 0): ?>
-          <?php while ($order = mysqli_fetch_assoc($result)): ?>
-            <?php
-            $order_id = $order['id'];
-            $items_query = "SELECT s.service_name, i.qty FROM tbl_order_items i 
-                                JOIN tbl_services s ON i.service_id = s.id 
-                                WHERE i.order_id = '$order_id'";
-            $items_res = mysqli_query($conn, $items_query);
-
-            $all_items = [];
-            $total_berat = 0;
-            while ($item = mysqli_fetch_assoc($items_res)) {
-              $all_items[] = $item['service_name'];
-              $total_berat += (float) $item['qty'];
-            }
-
-            $display_items_arr = array_slice($all_items, 0, 2);
-            $display_items = implode(", ", $display_items_arr);
-            $sisa_item = count($all_items) - 2;
-            $semua_layanan = ($sisa_item > 0) ? $display_items . "... (+" . $sisa_item . " item lainnya)" : $display_items;
-
-            $status_class = "text-bg-danger";
-            if ($order['status'] === "Selesai")
-              $status_class = "text-bg-success";
-            elseif ($order['status'] === "Proses")
-              $status_class = "text-bg-warning";
-            ?>
-            <div class="col">
-              <div class="card h-100">
-                <img src="waduh.jpg" class="card-img-top" alt="mesin-cuci">
-                <div class="card-body text-start">
-                  <div class="d-flex justify-content-between mb-2">
-                    <h5 class="card-title">Pesanan #<?php echo $order['id']; ?></h5>
-                    <h1 class="badge p-2 w-50 <?php echo $status_class; ?>"><?php echo $order['status']; ?></h1>
-                  </div>
-                  <p class="card-text"><strong>Layanan:</strong> <?php echo $semua_layanan; ?></p>
-                  <p class="card-text"><strong>Total Berat:</strong> <?php echo $total_berat; ?> kg</p>
-                  <p class="card-text"><strong>Total:</strong> Rp
-                    <?php echo number_format($order['total_amount'], 0, ',', '.'); ?>
-                  </p>
-                </div>
-                <div class="card-footer border-top-0 pb-4">
-                  <div class="d-grid gap-2">
-                    <a href="detail-order.html?id=<?php echo $order['id']; ?>" class="btn btn-primary p-2">Detail
-                      Pesanan</a>
-                    <button onclick="hapusPesanan(<?php echo $order['id']; ?>)" class="btn btn-danger p-2">Hapus
-                      Pesanan</button>
-                  </div>
-                </div>
+              <div style="display: flex; gap: 10px;">
+                <a href="detail-order.php?id=<?php echo $order['id']; ?>"
+                  style="flex: 1; text-align: center; background: #49b1c8; color: white; text-decoration: none; padding: 10px; border-radius: 10px; font-size: 0.85rem; font-weight: 600;">Detail</a>
+                <button onclick="hapusPesanan(<?php echo $order['id']; ?>)"
+                  style="flex: 1; background: #ef4444; color: white; border: none; padding: 10px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">Hapus</button>
               </div>
             </div>
-          <?php endwhile; ?>
-        <?php else: ?>
-          <div class="col-12 text-center py-5">
-            <div style="font-size: 50px; color: #ccc; margin-bottom: 20px;">📦</div>
-            <p class="text-muted">Anda belum memiliki riwayat pesanan.</p>
-            <a href="keranjang.php" class="btn btn-primary btn-sm mt-3">Buat Pesanan Sekarang</a>
           </div>
-        <?php endif; ?>
+        </div>
+      <?php endwhile; ?>
+    <?php else: ?>
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 0;">
+        <div style="font-size: 60px; margin-bottom: 20px;">📦</div>
+        <p style="color: #888; font-size: 1.1rem;">Anda belum memiliki riwayat pesanan.</p>
+        <a href="keranjang.php"
+          style="display: inline-block; margin-top: 10px; background: #49b1c8; color: white; text-decoration: none; padding: 12px 24px; border-radius: 20px; font-weight: 600;">Buat
+          Pesanan Sekarang</a>
       </div>
-    </div>
-
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script>
-      function hapusPesanan(id) {
-        if (confirm("Apakah Anda yakin ingin menghapus pesanan #" + id + " ini?")) {
-          const urlParams = new URLSearchParams(window.location.search);
-          const cid = urlParams.get('cid') || '1';
-          window.location.href = `delete_order.php?id=${id}&cid=${cid}`;
-        }
-      }
-    </script>
+    <?php endif; ?>
   </div>
-  <footer>
-    <div class="footer-content">
-      <div class="footer-logo">CleanWash</div>
-      <p class="footer-copy">
-        &copy; 2026 CleanWash Laundry. All Rights Reserved.
-      </p>
-    </div>
-  </footer>
+</section>
+
+<?php include 'includes/footer.php'; ?>
+
+<script>
+  function hapusPesanan(id) {
+    if (confirm("Apakah Anda yakin ingin menghapus pesanan #" + id + " ini?")) {
+      window.location.href = `delete_order.php?id=${id}`;
+    }
+  }
+</script>
 </body>
 
 </html>

@@ -77,28 +77,6 @@ galleryCards.forEach((card, index) => {
   galleryObserver.observe(card);
 });
 
-// fungsi untuk menampilkan loader saat pindah halaman
-// window.onload = () => {
-//   document.querySelector(".page").classList.add("show");
-// };
-
-// document.querySelectorAll("a").forEach((link) => {
-//   link.addEventListener("click", function (e) {
-//     const href = this.getAttribute("href");
-
-//     if (href && !href.startsWith("#")) {
-//       e.preventDefault();
-
-//       document.getElementById("loader").classList.add("show");
-//       document.querySelector(".page").classList.add("fade-out");
-
-//       setTimeout(() => {
-//         window.location.href = href;
-//       }, 650);
-//     }
-//   });
-// });
-
 // FITUR KERANJANG PEMESANAN
 
 let cart = JSON.parse(localStorage.getItem("cleanwash_cart")) || [];
@@ -153,18 +131,17 @@ window.updateCartUI = function () {
 window.addToCart = function (name, price, unit, estimate, qty) {
   if (qty <= 0 || isNaN(qty)) {
     alert("Mohon masukkan jumlah pesanan yang valid.");
-    return;
-  }
-
-  const existingIndex = cart.findIndex((item) => item.name === name);
-  if (existingIndex !== -1) {
-    cart[existingIndex].qty += qty;
   } else {
-    cart.push({ name, price, unit, estimate, qty });
-  }
+    const existingIndex = cart.findIndex((item) => item.name === name);
+    if (existingIndex !== -1) {
+      cart[existingIndex].qty += qty;
+    } else {
+      cart.push({ name, price, unit, estimate, qty });
+    }
 
-  localStorage.setItem("cleanwash_cart", JSON.stringify(cart));
-  updateCartUI();
+    localStorage.setItem("cleanwash_cart", JSON.stringify(cart));
+    updateCartUI();
+  }
 };
 
 window.removeFromCart = function (index) {
@@ -224,6 +201,12 @@ window.calculateTotal = function () {
     deliveryEl.innerText = `Rp ${deliveryFee.toLocaleString("id-ID")}`;
   if (totalEl) totalEl.innerText = `Rp ${finalTotal.toLocaleString("id-ID")}`;
 
+  // FIX: Update input hidden agar data terkirim ke database
+  const hiddenTotal = document.getElementById("hiddenTotalAmount");
+  const hiddenFee = document.getElementById("hiddenDeliveryFee");
+  if (hiddenTotal) hiddenTotal.value = finalTotal;
+  if (hiddenFee) hiddenFee.value = deliveryFee;
+
   return { finalTotal, deliveryFee, deliveryMethod };
 };
 
@@ -252,7 +235,7 @@ window.kirimWhatsApp = function () {
   });
 
   const message =
-    `Halo CleanWash Laundry, saya ingin melakukan pemesanan layanan laundry.\n\n` +
+    `Halo CleanWash Laundry, java saya ingin melakukan pemesanan layanan laundry.\n\n` +
     `*Data Pelanggan:*\n` +
     `Nama: ${name}\n` +
     `No. HP: ${phone}\n` +
@@ -282,10 +265,10 @@ window.kirimWhatsApp = function () {
 document.addEventListener("input", (e) => {
   if (e.target.matches("input, select, textarea")) {
     validateForm();
+    calculateTotal();
   }
 });
 
-// Jalankan update UI saat pertama kali load
 window.onload = () => {
   updateCartUI();
 };
@@ -294,7 +277,6 @@ window.capitalizeInput = function (element) {
   let cursorPosition = element.selectionStart;
   let value = element.value;
 
-  // Mengubah setiap awal kata menjadi huruf besar
   let capitalized = value
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
