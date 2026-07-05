@@ -1,10 +1,6 @@
 <?php
 session_start();
-$host = "db";
-$user = "db";
-$pass = "db";
-$db = "db";
-$conn = mysqli_connect($host, $user, $pass, $db);
+include 'includes/connection.php';
 
 $full_name = "";
 if (isset($_SESSION['customer_id'])) {
