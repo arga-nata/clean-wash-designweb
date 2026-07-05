@@ -69,6 +69,8 @@ $cid = isset($_SESSION['customer_id']) ? $_SESSION['customer_id'] : (isset($_GET
                     <li><a href="paket.php"
                             class="<?php echo ($current_page == 'paket.php') ? 'active' : ''; ?>">Paket
                             Langganan</a></li>
+                    <li><a href="https://cleanwash.freedev.app/admin/"
+                            class="">Review</a></li>
                     
                     <?php if (!isset($_SESSION['username']) || $_SESSION['username'] !== 'admin'): ?>
                         <li><a href="keranjang.php"
