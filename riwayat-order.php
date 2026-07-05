@@ -82,7 +82,7 @@ $result = mysqli_query($conn, $query);
       <?php endwhile; ?>
     <?php else: ?>
       <div style="text-align: center; padding: 60px 0; width: 100%;">
-        <div style="font-size: 60px; margin-bottom: 20px;">📦</div>
+        <div style="font-size: 60px; margin-bottom: 20px;">?</div>
         <p style="color: #888; font-size: 1.1rem;">Anda belum memiliki riwayat pesanan.</p>
         <a href="keranjang.php" class="btn btn-info text-white"
           style="border-radius: 20px; font-weight: 600; padding: 12px 24px;">Buat Pesanan Sekarang</a>

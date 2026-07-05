@@ -1,5 +1,4 @@
 <?php
-// 1. KONEKSI DATABASE
 $host = "db";
 $user = "db";
 $pass = "db";
@@ -9,17 +8,6 @@ if (!$conn) {
     die("Connection Failed!");
 }
 
-// --- STATS QUERY ---
-$total_query = mysqli_query($conn, "SELECT COUNT(*) as total FROM tbl_orders");
-$total_data = mysqli_fetch_assoc($total_query);
-
-$pending_query = mysqli_query($conn, "SELECT COUNT(*) as total FROM tbl_orders WHERE status = 'Pending'");
-$pending_data = mysqli_fetch_assoc($pending_query);
-
-$done_query = mysqli_query($conn, "SELECT COUNT(*) as total FROM tbl_orders WHERE status = 'Selesai'");
-$done_data = mysqli_fetch_assoc($done_query);
-
-// 2. QUERY ORDER LIST
 $query = "SELECT o.id, c.customer_name, o.total_amount, o.status, o.order_date, 
               GROUP_CONCAT(s.service_name SEPARATOR ', ') as services 
               FROM tbl_orders o 
@@ -27,107 +15,120 @@ $query = "SELECT o.id, c.customer_name, o.total_amount, o.status, o.order_date,
               LEFT JOIN tbl_order_items oi ON o.id = oi.order_id 
               LEFT JOIN tbl_services s ON oi.service_id = s.id 
               GROUP BY o.id 
-              ORDER BY o.id DESC";
+              ORDER BY (o.status = 'Selesai') ASC, o.id DESC";
 $result = mysqli_query($conn, $query);
 
-// 3. PANGGIL NAVBAR
-include 'includes/header.php';
+include 'includes/admin_header.php';
 ?>
 
 <style>
-    .stat-card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        border: none;
-        border-radius: 16px;
+    body {
+        background-color: #f8fafc !important;
     }
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+
+    .admin-main-wrapper {
+        max-width: 1200px;
+        margin: 60px auto;
+        padding: 0 20px;
+        flex: 1;
     }
-    .status-badge {
-        padding: 0.5em 1em;
-        border-radius: 8px;
+
+    .admin-card {
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        overflow: hidden;
+    }
+
+    .custom-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 0;
+    }
+
+    .admin-table thead {
+        background-color: rgba(73, 177, 200, 0.9);
+        color: white;
+    }
+
+    .admin-table th {
+        padding: 18px 24px;
+        text-align: center;
         font-weight: 600;
         font-size: 0.85rem;
-    }
-    .table-container {
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-    .table thead th {
-        background-color: #f8f9fa;
         text-transform: uppercase;
-        font-size: 0.75rem;
         letter-spacing: 0.05em;
-        color: #6c757d;
-        border-bottom: 2px solid #dee2e6;
+        border: none;
+    }
+
+    .admin-table td {
+        padding: 16px 24px;
+        text-align: center;
+        border-bottom: 1px solid #f1f5f9;
+        color: #475569;
+        font-size: 0.9rem;
+        vertical-align: middle;
+    }
+
+    .admin-table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .status-text {
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+    .status-pending { color: #dc2626; }
+    .status-proses { color: #ca8a04; }
+    .status-done { color: #16a34a; }
+
+    .btn-admin {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 6px 12px;
+        transition: all 0.2s ease;
+        text-decoration: none !important;
+        cursor: pointer;
+    }
+
+    .btn-admin-primary {
+        background-color: #49b1c8;
+        color: white !important;
+        border: 1px solid #49b1c8;
+    }
+
+    .btn-admin-primary:hover {
+        background-color: #3ba8ba;
+        border-color: #3ba8ba;
+        color: white !important;
+    }
+
+    .btn-admin-outline {
+        background: white;
+        color: #49b1c8 !important;
+        border: 1px solid #49b1c8;
+    }
+
+    .btn-admin-outline:hover {
+        background: #f0faff;
+        color: #3ba8ba !important;
+        border-color: #3ba8ba;
     }
 </style>
 
-<div class="container py-4">
-    <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold mb-1">📦 Order Management</h2>
-            <p class="text-muted">Pantau dan kelola semua pesanan laundry pelanggan.</p>
-        </div>
-        <div class="text-end">
-            <span class="badge bg-dark p-2">Admin Mode</span>
-        </div>
-    </div>
-
-    <!-- Stat Cards Section -->
-    <div class="row g-3 mb-5">
-        <div class="col-md-4">
-            <div class="card stat-card bg-white shadow-sm p-3">
-                <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                        <span class="fs-3">📋</span>
-                    </div>
-                    <div>
-                        <p class="text-muted mb-0 small fw-medium">Total Orderan</p>
-                        <h3 class="fw-bold mb-0"><?= $total_data['total']; ?></h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card stat-card bg-white shadow-sm p-3">
-                <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 bg-warning bg-opacity-10 p-3 rounded-3 me-3">
-                        <span class="fs-3">⏳</span>
-                    </div>
-                    <div>
-                        <p class="text-muted mb-0 small fw-medium">Menunggu (Pending)</p>
-                        <h3 class="fw-bold mb-0"><?= $pending_data['total']; ?></h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card stat-card bg-white shadow-sm p-3">
-                <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 bg-success bg-opacity-10 p-3 rounded-3 me-3">
-                        <span class="fs-3">✅</span>
-                    </div>
-                    <div>
-                        <p class="text-muted mb-0 small fw-medium">Selesai</p>
-                        <h3 class="fw-bold mb-0"><?= $done_data['total']; ?></h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Table Section -->
-    <div class="table-container bg-white p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0">Daftar Pesanan Terbaru</h5>
-            <small class="text-muted">Urutan berdasarkan ID terbaru</small>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
+<div class="admin-main-wrapper">
+    <div class="admin-card">
+        <div class="custom-table-wrapper">
+            <table class="admin-table">
                 <thead>
                     <tr>
                         <th>Order ID</th>
@@ -136,32 +137,52 @@ include 'includes/header.php';
                         <th>Total</th>
                         <th>Status</th>
                         <th>Date</th>
-                        <th class="text-center">Actions</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (mysqli_num_rows($result) > 0): ?>
                         <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                            <?php 
+                                $status_class = 'status-pending';
+                                if ($row['status'] == 'Selesai') {
+                                    $status_class = 'status-done';
+                                } elseif ($row['status'] == 'Proses') {
+                                    $status_class = 'status-proses';
+                                }
+
+                                $next_status = '';
+                                $btn_text = '';
+                                if ($row['status'] == 'Pending') {
+                                    $next_status = 'Proses';
+                                    $btn_text = '➜ Proses';
+                                } elseif ($row['status'] == 'Proses') {
+                                    $next_status = 'Selesai';
+                                    $btn_text = '✓ Selesai';
+                                }
+                            ?>
                             <tr>
-                                <td class="fw-medium">#<?= $row['id']; ?></td>
-                                <td><strong><?= $row['customer_name'] ?? 'Unknown'; ?></strong></td>
-                                <td class="text-muted small"><?= $row['services'] ?? '-'; ?></td>
-                                <td class="fw-bold text-dark">Rp <?= number_format($row['total_amount'], 0, ',', '.'); ?></td>
+                                <td style="font-weight: 600; color: #475569;">#<?= $row['id']; ?></td>
+                                <td style="font-weight: 600; color: #1e293b;"><?= $row['customer_name'] ?? 'Unknown'; ?></td>
+                                <td style="font-size: 0.8rem; color: #94a3b8;"><?= $row['services'] ?? '-'; ?></td>
+                                <td style="font-weight: 700; color: #334155;">Rp <?= number_format($row['total_amount'], 0, ',', '.'); ?></td>
                                 <td>
-                                    <span class="status-badge <?= ($row['status'] == 'Selesai') ? 'bg-success text-white' : 'bg-warning text-dark'; ?>">
+                                    <span class="status-text <?= $status_class; ?>">
                                         <?= $row['status']; ?>
                                     </span>
                                 </td>
-                                <td class="text-muted small"><?= $row['order_date']; ?></td>
-                                <td class="text-center">
-                                    <div class="btn-group">
-                                        <a href="update_status.php?id=<?= $row['id']; ?>&status=Selesai"
-                                            class="btn btn-sm btn-outline-success" title="Set Selesai">
-                                            ✓ Selesai
-                                        </a>
-                                        <a href="delete_order.php?id=<?= $row['id']; ?>"
-                                            class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus orderan ini?')" title="Hapus">
-                                            🗑️ Hapus
+                                <td style="font-size: 0.8rem;"><?= $row['order_date']; ?></td>
+                                <td>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <?php if ($next_status): ?>
+                                            <a href="update_status.php?id=<?= $row['id']; ?>&status=<?= $next_status; ?>" 
+                                               class="btn-admin btn-admin-primary" title="Majukan Status">
+                                                <?= $btn_text; ?>
+                                            </a>
+                                        <?php endif; ?>
+                                        <a href="delete_order.php?id=<?= $row['id']; ?>" 
+                                           class="btn-admin btn-admin-outline" onclick="return confirm('Hapus orderan ini?')" title="Hapus">
+                                            ✕
                                         </a>
                                     </div>
                                 </td>
@@ -169,9 +190,9 @@ include 'includes/header.php';
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">
-                                <div class="mb-3">📦</div>
-                                <p>Belum ada pesanan. Silakan buat pesanan di halaman depan!</p>
+                            <td colspan="7" style="text-align:center; padding: 60px; color: #94a3b8;">
+                                <div style="font-size: 2rem; margin-bottom: 10px;">📦</div>
+                                <p>Belum ada data pesanan yang tersedia.</p>
                             </td>
                         </tr>
                     <?php endif; ?>

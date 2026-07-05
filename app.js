@@ -1,52 +1,41 @@
-// ambil nama file aktif
-let currentPage = window.location.pathname.split("/").pop();
-
-const protectedPages = ["keranjang.html", "riwayat-order.html"]; // Daftar halaman yang harus login
-
-if (protectedPages.includes(currentPage)) {
-  const customerId = localStorage.getItem("customer_id");
-  if (!customerId) {
-    window.location.href = "login.html";
-  }
-}
-
-// --- LOGIKA KERANJANG (CART) ---
 let cart = JSON.parse(localStorage.getItem("cleanwash_cart")) || [];
 
 function updateCartUI() {
-  const cartItemsContainer = document.getElementById("cart-items");
+  const cartItemsContainer = document.getElementById("cartList");
   if (!cartItemsContainer) return;
 
   cartItemsContainer.innerHTML = "";
 
   if (cart.length === 0) {
-    cartItemsContainer.innerHTML = `<div class="empty-cart">Keranjang Anda kosong.</div>`;
+    cartItemsContainer.innerHTML = `<div class="empty-cart" style="text-align:center; padding: 20px; color: #888;">Keranjang Anda kosong.</div>`;
   } else {
     cart.forEach((item, index) => {
       const itemDiv = document.createElement("div");
       itemDiv.className = "cart-item";
+
       itemDiv.innerHTML = `
         <div class="item-info">
-          <span class="item-name">${item.name}</span>
-          <span class="item-qty">Jumlah: ${item.qty} ${item.unit}</span>
+          <span class="item-name" style="display:block; font-weight:600;">${item.name}</span>
+          <span class="item-qty" style="font-size:0.8rem; color:#666;">Jumlah: ${item.qty} ${item.unit}</span>
         </div>
-        <div class="item-price">
-          <span>Rp ${(item.price * item.qty).toLocaleString("id-ID")}</span>
-          <button class="remove-btn" onclick="removeFromCart(${index})">Hapus</button>
+        <div class="item-price" style="display:flex; align-items:center; gap:10px;">
+          <span style="font-weight:600;">Rp ${(item.price * item.qty).toLocaleString("id-ID")}</span>
+          <button class="btn-del" onclick="removeFromCart(${index})">✕</button>
         </div>
       `;
       cartItemsContainer.appendChild(itemDiv);
     });
   }
   calculateTotal();
+  validateOrderForm();
 }
 
-function addToCart(name, price, unit) {
+function addToCart(name, price, unit, estimate, qty) {
   const existingItem = cart.find((item) => item.name === name);
   if (existingItem) {
-    existingItem.qty += 1;
+    existingItem.qty += qty;
   } else {
-    cart.push({ name, price, qty: 1, unit });
+    cart.push({ name, price, qty, unit, estimate });
   }
   saveCart();
   updateCartUI();
@@ -63,58 +52,90 @@ function saveCart() {
 }
 
 function calculateTotal() {
-  const totalElement = document.getElementById("total-amount");
-  const deliveryElement = document.getElementById("delivery-fee");
+  const totalElement = document.getElementById("totalAmount");
+  const subtotalElement = document.getElementById("subtotalAmount");
+  const deliveryElement = document.getElementById("deliveryFeeAmount");
+  const estimateElement = document.getElementById("totalEstimate");
+
   const hiddenTotal = document.getElementById("hiddenTotalAmount");
   const hiddenDelivery = document.getElementById("hiddenDeliveryFee");
-  const areaSelect = document.getElementById("area-pickup");
-  const methodSelect = document.getElementsByName("pickup-method");
+
+  const areaSelect = document.getElementById("locationArea");
+  const methodRadios = document.getElementsByName("deliveryMethod");
 
   if (!totalElement) return;
 
   let subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   let deliveryFee = 0;
+  let maxEstimate = 0;
 
-  if (methodSelect && methodSelect.length > 0) {
-    const selectedMethod = Array.from(methodSelect).find(
+  if (methodRadios && methodRadios.length > 0) {
+    const selectedMethod = Array.from(methodRadios).find(
       (r) => r.checked,
     )?.value;
-    if (selectedMethod === "kurir") {
+    if (selectedMethod === "Kurir Jemput") {
       if (areaSelect) {
         const area = areaSelect.value;
         if (area === "kota") deliveryFee = 5000;
-        else if (area === "kabupaten") deliveryFee = 15000;
-        else if (area === "luar_kota") deliveryFee = 25000;
+        else if (area === "kabupaten") deliveryFee = 10000;
+        else if (area === "luar") deliveryFee = 20000;
       }
     }
   }
 
+  cart.forEach((item) => {
+    const est = parseInt(item.estimate) || 0;
+    if (est > maxEstimate) maxEstimate = est;
+  });
+
   const total = subtotal + deliveryFee;
 
   totalElement.innerText = `Rp ${total.toLocaleString("id-ID")}`;
-  if (deliveryElement) {
+  if (subtotalElement)
+    subtotalElement.innerText = `Rp ${subtotal.toLocaleString("id-ID")}`;
+  if (deliveryElement)
     deliveryElement.innerText = `Rp ${deliveryFee.toLocaleString("id-ID")}`;
-  }
-  if (hiddenTotal) {
-    hiddenTotal.value = total;
-  }
-  if (hiddenDelivery) {
-    hiddenDelivery.value = deliveryFee;
+  if (estimateElement) estimateElement.innerText = `${maxEstimate} Hari`;
+  if (hiddenTotal) hiddenTotal.value = total;
+  if (hiddenDelivery) hiddenDelivery.value = deliveryFee;
+}
+
+function validateOrderForm() {
+  const btn = document.getElementById("btnWhatsApp");
+  if (!btn) return;
+
+  const name = document.getElementById("custName")?.value.trim();
+  const phone = document.getElementById("custPhone")?.value.trim();
+  const address = document.getElementById("custAddress")?.value.trim();
+
+  if (name && phone && address && cart.length > 0) {
+    btn.disabled = false;
+  } else {
+    btn.disabled = true;
   }
 }
 
-// --- LOGIKA FORM PESANAN (KERANJANG) ---
-const orderForm = document.getElementById("order-form");
+const orderForm = document.getElementById("orderForm");
 if (orderForm) {
-  orderForm.addEventListener("submit", async (e) => {
+  orderForm.onsubmit = async function (e) {
     e.preventDefault();
+    const btn = document.getElementById("btnWhatsApp");
+    const originalText = btn.innerText;
+
+    btn.innerText = "Mengirim...";
+    btn.style.backgroundColor = "#ccc";
+    btn.disabled = true;
 
     const formData = new FormData(orderForm);
-    const submitBtn = orderForm.querySelector("button[type='submit']");
-    const originalBtnText = submitBtn.innerText;
-
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Memproses...";
+    formData.append(
+      "totalAmount",
+      document.getElementById("hiddenTotalAmount").value,
+    );
+    formData.append(
+      "deliveryFee",
+      document.getElementById("hiddenDeliveryFee").value,
+    );
+    formData.append("cartData", JSON.stringify(cart));
 
     try {
       const response = await fetch("keranjang.php", {
@@ -124,54 +145,30 @@ if (orderForm) {
       const result = await response.json();
 
       if (result.status === "success") {
-        submitBtn.style.backgroundColor = "#22c55e";
-        submitBtn.innerText = "Berhasil!";
+        btn.innerText = "Berhasil!";
+        btn.style.backgroundColor = "#28a745";
         localStorage.removeItem("cleanwash_cart");
+        cart = [];
         setTimeout(() => {
           window.location.href = "riwayat-order.php";
         }, 1500);
       } else {
-        alert(result.message || "Terjadi kesalahan saat membuat pesanan.");
-        submitBtn.disabled = false;
-        submitBtn.innerText = originalBtnText;
+        alert(result.message || "Terjadi kesalahan.");
+        btn.disabled = false;
+        btn.innerText = originalText;
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Terjadi kesalahan jaringan. Silakan coba lagi.");
-      submitBtn.disabled = false;
-      submitBtn.innerText = originalBtnText;
+      alert("Koneksi gagal.");
+      btn.disabled = false;
+      btn.innerText = originalText;
     }
-  });
+  };
 }
 
-// --- LOGIKA FORM KONTAK (WHATSAPP) ---
-const whatsappForm = document.getElementById("whatsapp-contact-form");
-if (whatsappForm) {
-  whatsappForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById("contact-name").value;
-    const email = document.getElementById("contact-email").value;
-    const rawMessage = document.getElementById("contact-message").value;
-    const message = rawMessage
-      .toLowerCase()
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-
-    // Format pesan untuk WhatsApp
-    const waText = `Halo CleanWash Laundry, saya ingin bertanya:\n\n*Nama:* ${name}\n*Email:* ${email}\n*Pesan:* ${message}`;
-    const encodedText = encodeURIComponent(waText);
-    const phoneNumber = "6281234567890"; // Ganti dengan nomor WA admin
-
-    window.open(`https://wa.me/${phoneNumber}?text=${encodedText}`, "_blank");
-  });
-}
-
-// Listener untuk update total secara real-time
 document.addEventListener("input", () => {
   calculateTotal();
+  validateOrderForm();
 });
 
-// Inisialisasi awal
 updateCartUI();
+validateOrderForm();
