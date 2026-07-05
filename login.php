@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $username = $_POST['username'];
   $password = $_POST['password'];
 
-  $stmt = $conn->prepare("SELECT id, password FROM tbl_customers WHERE username = ?");
+  $stmt = $conn->prepare("SELECT id, password, username FROM tbl_customers WHERE username = ?");
   $stmt->bind_param("s", $username);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -27,7 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (password_verify($password, $user['password'])) {
       $_SESSION['customer_id'] = $user['id'];
       $_SESSION['username'] = $username;
-      echo json_encode(['status' => 'success']);
+      
+      $role = 'user';
+      if ($username === 'admin') {
+        $role = 'admin';
+      }
+
+      echo json_encode(['status' => 'success', 'role' => $role]);
     } else {
       echo json_encode(['status' => 'error', 'message' => 'Password salah, silakan coba kembali.']);
     }
@@ -101,7 +107,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         btn.style.background = "#28a745";
 
         setTimeout(() => {
-          window.location.href = "index.php";
+          if (result.role === 'admin') {
+            window.location.href = "dashboard.php";
+          } else {
+            window.location.href = "index.php";
+          }
         }, 1500);
       } else {
         msgDiv.innerHTML = `<div style="background: #fee2e2; color: #b91c1c; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; text-align: center;">${result.message}</div>`;
@@ -117,3 +127,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
   };
 </script>
+</body>
+
+</html>

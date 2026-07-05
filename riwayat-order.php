@@ -23,6 +23,36 @@ $result = mysqli_query($conn, $query);
 
 <?php include 'includes/header.php'; ?>
 
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+<style>
+  .btn-riwayat-primary {
+    background-color: #49b1c8;
+    color: white !important;
+    border: 1px solid #49b1c8;
+    transition: all 0.2s ease;
+  }
+
+  .btn-riwayat-primary:hover {
+    background-color: #3ba8ba;
+    border-color: #3ba8ba;
+    color: white !important;
+  }
+
+  .btn-riwayat-outline {
+    background: white;
+    color: #49b1c8 !important;
+    border: 1px solid #49b1c8;
+    transition: all 0.2s ease;
+  }
+
+  .btn-riwayat-outline:hover {
+    background: #f0faff;
+    color: #3ba8ba !important;
+    border-color: #3ba8ba;
+  }
+</style>
+
 <section class="page-container" style="padding: 110px 10% 60px 10%; text-align: center;">
   <h2 class="section-title">Riwayat Pesanan Saya</h2>
   <p style="color: #666; margin-bottom: 40px;">
@@ -71,9 +101,9 @@ $result = mysqli_query($conn, $query);
               </p>
 
               <div class="d-flex flex-column gap-2">
-                <a href="detail-order.php?id=<?php echo $order['id']; ?>" class="btn btn-info text-white flex-fill"
+                <a href="detail-order.php?id=<?php echo $order['id']; ?>" class="btn btn-riwayat-primary flex-fill"
                   style="border-radius: 10px; font-size: 0.85rem; font-weight: 600;">Detail</a>
-                <button onclick="hapusPesanan(<?php echo $order['id']; ?>)" class="btn btn-danger flex-fill"
+                <button onclick="hapusPesanan(<?php echo $order['id']; ?>)" class="btn btn-riwayat-outline flex-fill"
                   style="border-radius: 10px; font-size: 0.85rem; font-weight: 600;">Hapus</button>
               </div>
             </div>
@@ -82,9 +112,11 @@ $result = mysqli_query($conn, $query);
       <?php endwhile; ?>
     <?php else: ?>
       <div style="text-align: center; padding: 60px 0; width: 100%;">
-        <div style="font-size: 60px; margin-bottom: 20px;">?</div>
+        <div style="font-size: 80px; color: #ccc; margin-bottom: 20px;">
+          <iconify-icon icon="lets-icons:order"></iconify-icon>
+        </div>
         <p style="color: #888; font-size: 1.1rem;">Anda belum memiliki riwayat pesanan.</p>
-        <a href="keranjang.php" class="btn btn-info text-white"
+        <a href="keranjang.php" class="btn btn-riwayat-primary"
           style="border-radius: 20px; font-weight: 600; padding: 12px 24px;">Buat Pesanan Sekarang</a>
       </div>
     <?php endif; ?>

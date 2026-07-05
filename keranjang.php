@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+if (!isset($_SESSION['customer_id'])) {
+  header("Location: login.php");
+  exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['custName'])) {
   error_reporting(0);
   ini_set('display_errors', 0);
@@ -59,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['custName'])) {
       $stmt_svc = $conn->prepare("SELECT id FROM tbl_services WHERE service_name = ?");
       $stmt_svc->bind_param("s", $item['name']);
       $stmt_svc->execute();
-      $res_svc = $stmt_svc->get_result();
+      $res_svc = $stmt->get_result();
       $svc = $res_svc->fetch_assoc();
 
       if (!$svc) {
@@ -297,7 +302,6 @@ if (isset($_SESSION['customer_id'])) {
           if (response.ok && result.status === "success") {
             btn.innerText = "Berhasil!";
             btn.style.backgroundColor = "#28a745";
-            // TAMBAHAN: Hapus keranjang di localStorage setelah order berhasil
             localStorage.removeItem("cleanwash_cart");
             cart = [];
             setTimeout(() => { window.location.href = "riwayat-order.php"; }, 1500);
