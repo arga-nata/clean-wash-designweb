@@ -17,8 +17,13 @@ if (isset($_GET['id'])) {
 
     $sql_order = "DELETE FROM tbl_orders WHERE id = '$order_id'";
     if (mysqli_query($conn, $sql_order)) {
-        $cid = isset($_GET['cid']) ? $_GET['cid'] : 1;
-        header("Location: riwayat-order.php?cid=$cid");
+        if (isset($_GET['admin']) && $_GET['admin'] === '1') {
+            header("Location: dashboard.php");
+        } else {
+            $cid = isset($_GET['cid']) ? $_GET['cid'] : 1;
+            header("Location: riwayat-order.php?cid=$cid");
+        }
+        exit;
     } else {
         echo "Gagal menghapus pesanan: " . mysqli_error($conn);
     }

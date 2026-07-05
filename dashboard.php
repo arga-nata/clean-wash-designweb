@@ -36,8 +36,8 @@ include 'includes/admin_header.php';
     .admin-card {
         background: #ffffff;
         border-radius: 20px;
-        border: 1px solid rgba(0,0,0,0.05);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
         overflow: hidden;
     }
 
@@ -80,12 +80,21 @@ include 'includes/admin_header.php';
     }
 
     .status-text {
-        font-weight: 700;
+        font-weight: 500;
         font-size: 0.85rem;
     }
-    .status-pending { color: #dc2626; }
-    .status-proses { color: #ca8a04; }
-    .status-done { color: #16a34a; }
+
+    .status-pending {
+        color: #dc2626;
+    }
+
+    .status-proses {
+        color: #ca8a04;
+    }
+
+    .status-done {
+        color: #16a34a;
+    }
 
     .btn-admin {
         display: inline-flex;
@@ -143,45 +152,47 @@ include 'includes/admin_header.php';
                 <tbody>
                     <?php if (mysqli_num_rows($result) > 0): ?>
                         <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                            <?php 
-                                $status_class = 'status-pending';
-                                if ($row['status'] == 'Selesai') {
-                                    $status_class = 'status-done';
-                                } elseif ($row['status'] == 'Proses') {
-                                    $status_class = 'status-proses';
-                                }
+                            <?php
+                            $status_class = 'status-pending';
+                            if ($row['status'] == 'Selesai') {
+                                $status_class = 'status-done';
+                            } elseif ($row['status'] == 'Proses') {
+                                $status_class = 'status-proses';
+                            }
 
-                                $next_status = '';
-                                $btn_text = '';
-                                if ($row['status'] == 'Pending') {
-                                    $next_status = 'Proses';
-                                    $btn_text = '➜ Proses';
-                                } elseif ($row['status'] == 'Proses') {
-                                    $next_status = 'Selesai';
-                                    $btn_text = '✓ Selesai';
-                                }
+                            $next_status = '';
+                            $btn_text = '';
+                            if ($row['status'] == 'Pending') {
+                                $next_status = 'Proses';
+                                $btn_text = '➜ Proses';
+                            } elseif ($row['status'] == 'Proses') {
+                                $next_status = 'Selesai';
+                                $btn_text = '✓ Selesai';
+                            }
                             ?>
                             <tr>
                                 <td style="font-weight: 600; color: #475569;">#<?= $row['id']; ?></td>
                                 <td style="font-weight: 600; color: #1e293b;"><?= $row['customer_name'] ?? 'Unknown'; ?></td>
                                 <td style="font-size: 0.8rem; color: #94a3b8;"><?= $row['services'] ?? '-'; ?></td>
-                                <td style="font-weight: 700; color: #334155;">Rp <?= number_format($row['total_amount'], 0, ',', '.'); ?></td>
+                                <td style="font-weight: 700; color: #334155;">Rp
+                                    <?= number_format($row['total_amount'], 0, ',', '.'); ?>
+                                </td>
                                 <td>
                                     <span class="status-text <?= $status_class; ?>">
-                                        <?= $row['status']; ?>
-                                    </span>
+                                        <?= $row['status']; ?></span>
                                 </td>
                                 <td style="font-size: 0.8rem;"><?= $row['order_date']; ?></td>
                                 <td>
                                     <div class="d-flex gap-2 justify-content-center">
                                         <?php if ($next_status): ?>
-                                            <a href="update_status.php?id=<?= $row['id']; ?>&status=<?= $next_status; ?>" 
-                                               class="btn-admin btn-admin-primary" title="Majukan Status">
+                                            <a href="update_status.php?id=<?= $row['id']; ?>&status=<?= $next_status; ?>"
+                                                class="btn-admin btn-admin-primary" title="Majukan Status">
                                                 <?= $btn_text; ?>
                                             </a>
                                         <?php endif; ?>
-                                        <a href="delete_order.php?id=<?= $row['id']; ?>" 
-                                           class="btn-admin btn-admin-outline" onclick="return confirm('Hapus orderan ini?')" title="Hapus">
+                                        <a href="delete_order.php?id=<?= $row['id']; ?>&admin=1"
+                                            class="btn-admin btn-admin-outline" onclick="return confirm('Hapus orderan ini?')"
+                                            title="Hapus">
                                             ✕
                                         </a>
                                     </div>
@@ -191,7 +202,7 @@ include 'includes/admin_header.php';
                     <?php else: ?>
                         <tr>
                             <td colspan="7" style="text-align:center; padding: 60px; color: #94a3b8;">
-                                <div style="font-size: 2rem; margin-bottom: 10px;">📦</div>
+                                <div style="font-size: 2rem; margin-bottom: 10px; color: #ccc;">?</div>
                                 <p>Belum ada data pesanan yang tersedia.</p>
                             </td>
                         </tr>

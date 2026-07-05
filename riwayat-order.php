@@ -113,7 +113,7 @@ $result = mysqli_query($conn, $query);
     <?php else: ?>
       <div style="text-align: center; padding: 60px 0; width: 100%;">
         <div style="font-size: 80px; color: #ccc; margin-bottom: 20px;">
-          <iconify-icon icon="lets-icons:order"></iconify-icon>
+          ?
         </div>
         <p style="color: #888; font-size: 1.1rem;">Anda belum memiliki riwayat pesanan.</p>
         <a href="keranjang.php" class="btn btn-riwayat-primary"
