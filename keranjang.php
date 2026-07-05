@@ -64,23 +64,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['custName'])) {
       $stmt_svc = $conn->prepare("SELECT id FROM tbl_services WHERE service_name = ?");
       $stmt_svc->bind_param("s", $item['name']);
       $stmt_svc->execute();
-      $res_svc = $stmt->get_result();
+      $res_svc = $stmt_svc->get_result();
       $svc = $res_svc->fetch_assoc();
+      $service_id = $svc ? $svc['id'] : 1;
 
-      if (!$svc) {
-        throw new Exception("Layanan '" . $item['name'] . "' tidak ditemukan di database!");
-      }
-
-      $service_id = $svc['id'];
       $subtotal = (float) ($item['price'] ?? 0) * (int) ($item['qty'] ?? 0);
-
       $stmt_item = $conn->prepare("INSERT INTO tbl_order_items (order_id, service_id, qty, subtotal) VALUES (?, ?, ?, ?)");
       $stmt_item->bind_param("iidd", $order_id, $service_id, $item['qty'], $subtotal);
       $stmt_item->execute();
     }
 
     mysqli_commit($conn);
-
     if (ob_get_length())
       ob_clean();
     header('Content-Type: application/json');
@@ -101,23 +95,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['custName'])) {
   }
 }
 
-// --- LOGIKA AUTO-FILL DATA PELANGGAN ---
+// --- AMBIL DATA UNTUK TAMPILAN (Satu Koneksi) ---
 $user_data = ['customer_name' => '', 'customer_phone' => '', 'customer_address' => ''];
-if (isset($_SESSION['customer_id'])) {
-  $host = "db";
-  $user = "db";
-  $pass = "db";
-  $db = "db";
-  $conn = mysqli_connect($host, $user, $pass, $db);
-  if ($conn) {
-    $cust_id = $_SESSION['customer_id'];
-    $query = "SELECT customer_name, customer_phone, customer_address FROM tbl_customers WHERE id = '$cust_id'";
-    $result = mysqli_query($conn, $query);
-    if ($result && mysqli_num_rows($result) > 0) {
-      $user_data = mysqli_fetch_assoc($result);
+$services_list = [];
+
+$host = "db";
+$user = "db";
+$pass = "db";
+$db = "db";
+$conn = mysqli_connect($host, $user, $pass, $db);
+
+if ($conn) {
+    // 1. Ambil Data User
+    if (isset($_SESSION['customer_id'])) {
+        $cust_id = $_SESSION['customer_id'];
+        $query_user = "SELECT customer_name, customer_phone, customer_address FROM tbl_customers WHERE id = '$cust_id'";
+        $res_user = mysqli_query($conn, $query_user);
+        if ($res_user && mysqli_num_rows($res_user) > 0) {
+            $user_data = mysqli_fetch_assoc($res_user);
+        }
     }
+    
+    // 2. Ambil Data Layanan
+    $res_svc = mysqli_query($conn, "SELECT * FROM tbl_services ORDER BY service_name ASC");
+    if ($res_svc) {
+        while ($row = mysqli_fetch_assoc($res_svc)) {
+            $services_list[] = $row;
+        }
+    }
+    
     mysqli_close($conn);
-  }
 }
 ?>
 <?php include 'includes/header.php'; ?>
@@ -142,18 +149,14 @@ if (isset($_SESSION['customer_id'])) {
           <label for="serviceSelect">Pilih Jenis Layanan</label>
           <select id="serviceSelect" onchange="updatePlaceholder()">
             <option value="" disabled selected>-- Pilih Layanan --</option>
-            <option value="Cuci Kering" data-price="6000" data-unit="kg" data-estimate="2 Hari">Cuci Kering (Rp
-              6.000/kg)</option>
-            <option value="Cuci Setrika" data-price="7000" data-unit="kg" data-estimate="2 Hari">Cuci Setrika (Rp
-              7.000/kg)</option>
-            <option value="Setrika Saja" data-price="5000" data-unit="kg" data-estimate="1 Hari">Setrika Saja (Rp
-              5.000/kg)</option>
-            <option value="Cuci Karpet" data-price="15000" data-unit="pcs" data-estimate="3 Hari">Cuci Karpet (Rp
-              15.000/pcs)</option>
-            <option value="Cuci Selimut" data-price="12000" data-unit="pcs" data-estimate="2 Hari">Cuci Selimut (Rp
-              12.000/pcs)</option>
-            <option value="Cuci Jas" data-price="25000" data-unit="pcs" data-estimate="3 Hari">Cuci Jas (Rp 25.000/pcs)
-            </option>
+            <?php foreach ($services_list as $svc): ?>
+                <option value="<?= htmlspecialchars($svc['service_name']) ?>" 
+                        data-price="<?= $svc['price'] ?>" 
+                        data-unit="<?= htmlspecialchars($svc['unit']) ?>" 
+                        data-estimate="<?= htmlspecialchars($svc['estimate']) ?>">
+                    <?= htmlspecialchars($svc['service_name']) ?> (Rp <?= number_format($svc['price'], 0, ',', '.') ?>/<?= htmlspecialchars($svc['unit']) ?>)
+                </option>
+            <?php endforeach; ?>
           </select>
         </div>
 
@@ -322,5 +325,4 @@ if (isset($_SESSION['customer_id'])) {
   }
 </script>
 </body>
-
 </html>
