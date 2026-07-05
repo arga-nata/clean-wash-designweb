@@ -33,6 +33,19 @@ $current_page = basename($_SERVER['PHP_SELF']);
             text-decoration: none !important;
             display: inline-block !important;
         }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .logo-img {
+            height: 35px;
+            width: auto;
+            object-fit: contain;
+        }
     </style>
 </head>
 
@@ -40,7 +53,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <div class="page" style="display: flex; flex-direction: column; min-height: 100vh;">
         <header>
             <nav class="nav">
-                <div class="logo"><span class="gradient-text">CleanWash Admin</span></div>
+                <div class="logo">
+                    <a href="dashboard.php" class="logo-container">
+                        <img src="logo.png" alt="Logo" class="logo-img">
+                        <span class="gradient-text">CleanWash Admin</span>
+                    </a>
+                </div>
                 <ul class="nav-links">
                     <li><a href="index.php"
                             class="<?php echo ($current_page == 'index.php') ? 'active' : ''; ?>">Web Utama</a></li>
@@ -48,6 +66,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             class="<?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">Dashboard</a></li>
                     <li><a href="users.php"
                             class="<?php echo ($current_page == 'users.php') ? 'active' : ''; ?>">Users</a></li>
+                    <li><a href="services.php"
+                            class="<?php echo ($current_page == 'services.php') ? 'active' : ''; ?>">Layanan</a></li>
                     <li>
                         <a href="logout.php" class="<?php echo ($current_page == 'logout.php') ? 'active' : ''; ?>">Log Out</a>
                     </li>

@@ -32,6 +32,19 @@ $cid = isset($_SESSION['customer_id']) ? $_SESSION['customer_id'] : (isset($_GET
             text-decoration: none !important;
             display: inline-block !important;
         }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .logo-img {
+            height: 35px;
+            width: auto;
+            object-fit: contain;
+        }
     </style>
 </head>
 
@@ -39,7 +52,12 @@ $cid = isset($_SESSION['customer_id']) ? $_SESSION['customer_id'] : (isset($_GET
     <div class="page" style="display: flex; flex-direction: column; min-height: 100vh;">
         <header>
             <nav class="nav">
-                <div class="logo"><span class="gradient-text">CleanWash</span></div>
+                <div class="logo">
+                    <a href="index.php" class="logo-container">
+                        <img src="logo.png" alt="Logo" class="logo-img">
+                        <span class="gradient-text">CleanWash</span>
+                    </a>
+                </div>
                 <ul class="nav-links">
                     <li><a href="index.php"
                             class="<?php echo ($current_page == 'index.php') ? 'active' : ''; ?>">Beranda</a></li>
@@ -68,7 +86,7 @@ $cid = isset($_SESSION['customer_id']) ? $_SESSION['customer_id'] : (isset($_GET
                     <?php if (isset($_SESSION['username']) && $_SESSION['username'] === 'admin'): ?>
                         <li>
                             <a href="dashboard.php" 
-                               class="<?php echo ($current_page == 'dashboard.php' || $current_page == 'users.php') ? 'active' : ''; ?>">
+                               class="<?php echo ($current_page == 'dashboard.php' || $current_page == 'users.php' || $current_page == 'services.php') ? 'active' : ''; ?>">
                                 Dashboard Admin
                             </a>
                         </li>

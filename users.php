@@ -1,4 +1,11 @@
 <?php
+session_start();
+
+if (!isset($_SESSION['username']) || $_SESSION['username'] !== 'admin') {
+    header("Location: index.php");
+    exit;
+}
+
 $host = "db";
 $user = "db";
 $pass = "db";
@@ -146,7 +153,7 @@ include 'includes/admin_header.php';
                     <?php else: ?>
                         <tr>
                             <td colspan="7" style="text-align:center; padding: 60px; color: #94a3b8;">
-                                <div style="font-size: 2rem; margin-bottom: 10px; color: #ccc;">?</div>
+                                <div style="font-size: 2rem; margin-bottom: 10px;">?</div>
                                 <p>Tidak ada data customer ditemukan.</p>
                             </td>
                         </tr>

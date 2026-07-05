@@ -84,12 +84,17 @@
 
                             if (mysqli_num_rows($result) > 0) {
                                 while ($row = mysqli_fetch_assoc($result)) {
+                                    $est = $row['estimate'];
+                                    if (is_numeric($est)) {
+                                        $est = $est . " Hari";
+                                    }
+
                                     echo "<tr>";
                                     echo "<td>" . $no++ . "</td>";
                                     echo "<td>" . $row['service_name'] . "</td>";
                                     echo "<td>Per " . $row['unit'] . "</td>";
                                     echo "<td>Rp " . number_format($row['price'], 0, ',', '.') . "</td>";
-                                    echo "<td>" . $row['estimate'] . "</td>";
+                                    echo "<td>" . $est . "</td>";
                                     echo "</tr>";
                                 }
                             } else {
