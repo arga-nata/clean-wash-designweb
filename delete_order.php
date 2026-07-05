@@ -1,13 +1,5 @@
 <?php
-$host = "db";
-$user = "db";
-$pass = "db";
-$db = "db";
-$conn = mysqli_connect($host, $user, $pass, $db);
-
-if (!$conn) {
-    die("Koneksi Database Gagal!");
-}
+include 'includes/connection.php';
 
 if (isset($_GET['id'])) {
     $order_id = intval($_GET['id']);

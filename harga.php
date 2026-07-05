@@ -69,11 +69,7 @@
                     </thead>
                     <tbody>
                         <?php
-                        $host = "db";
-                        $user = "db";
-                        $pass = "db";
-                        $db = "db";
-                        $conn = mysqli_connect($host, $user, $pass, $db);
+                        include 'includes/connection.php';
 
                         if (!$conn) {
                             echo "<tr><td colspan='5'>Gagal terhubung ke database</td></tr>";

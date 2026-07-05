@@ -1,16 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
-$host = "db";
-$user = "db";
-$pass = "db";
-$db = "db";
-
-$conn = mysqli_connect($host, $user, $pass, $db);
-if (!$conn) {
-    echo json_encode(['success' => false, 'message' => 'Connection Failed']);
-    exit;
-}
+include 'includes/connection.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
 
@@ -22,7 +13,7 @@ if (!$data) {
 $name = $data['customerName'] ?? '';
 $phone = $data['customerPhone'] ?? '';
 $address = $data['customerAddress'] ?? '';
-$items = $data['items'] ?? []; 
+$items = $data['items'] ?? [];
 $total = (float) ($data['total'] ?? 0);
 $deliveryMethod = $data['deliveryMethod'] ?? '';
 $locationArea = $data['locationArea'] ?? '';

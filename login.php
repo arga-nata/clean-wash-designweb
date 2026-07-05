@@ -2,11 +2,7 @@
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  $host = "db";
-  $user = "db";
-  $pass = "db";
-  $db = "db";
-  $conn = mysqli_connect($host, $user, $pass, $db);
+  include 'includes/connection.php';
 
   header('Content-Type: application/json');
 
@@ -27,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (password_verify($password, $user['password'])) {
       $_SESSION['customer_id'] = $user['id'];
       $_SESSION['username'] = $username;
-      
+
       $role = 'user';
       if ($username === 'admin') {
         $role = 'admin';

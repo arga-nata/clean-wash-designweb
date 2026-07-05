@@ -2,11 +2,7 @@
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  $host = "db";
-  $user = "db";
-  $pass = "db";
-  $db = "db";
-  $conn = mysqli_connect($host, $user, $pass, $db);
+  include 'includes/connection.php';
 
   header('Content-Type: application/json');
 

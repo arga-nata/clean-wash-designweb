@@ -6,15 +6,7 @@ if (!isset($_SESSION['username']) || $_SESSION['username'] !== 'admin') {
     exit;
 }
 
-$host = "db";
-$user = "db";
-$pass = "db";
-$db = "db";
-$conn = mysqli_connect($host, $user, $pass, $db);
-
-if (!$conn) {
-    die("Koneksi Database Gagal!");
-}
+include 'includes/connection.php';
 
 $message = "";
 $message_type = "";
@@ -32,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         $stmt = $conn->prepare("UPDATE tbl_services SET service_name = ?, price = ?, unit = ?, estimate = ? WHERE id = ?");
         $stmt->bind_param("sdssi", $name, $price, $unit, $estimate, $id);
-        
+
         if ($stmt->execute()) {
             header("Location: services.php");
             exit;
@@ -76,8 +68,8 @@ include 'includes/admin_header.php';
     .admin-card {
         background: #ffffff;
         border-radius: 24px;
-        border: 1px solid rgba(0,0,0,0.05);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
         padding: 40px;
     }
 
@@ -101,7 +93,9 @@ include 'includes/admin_header.php';
         margin-bottom: 8px;
     }
 
-    .field-group input, .field-group select, .field-group textarea {
+    .field-group input,
+    .field-group select,
+    .field-group textarea {
         width: 100%;
         padding: 12px 16px;
         border-radius: 12px;
@@ -110,7 +104,9 @@ include 'includes/admin_header.php';
         transition: all 0.2s ease;
     }
 
-    .field-group input:focus, .field-group select:focus, .field-group textarea:focus {
+    .field-group input:focus,
+    .field-group select:focus,
+    .field-group textarea:focus {
         outline: none;
         border-color: #49b1c8;
         box-shadow: 0 0 0 3px rgba(73, 177, 200, 0.1);
@@ -158,7 +154,8 @@ include 'includes/admin_header.php';
         <h2 class="form-title">Edit Layanan</h2>
 
         <?php if ($message): ?>
-            <div class="alert alert-<?= $message_type; ?> text-center" style="border-radius: 12px; font-size: 0.9rem; margin-bottom: 20px;">
+            <div class="alert alert-<?= $message_type; ?> text-center"
+                style="border-radius: 12px; font-size: 0.9rem; margin-bottom: 20px;">
                 <?= $message; ?>
             </div>
         <?php endif; ?>
@@ -168,14 +165,14 @@ include 'includes/admin_header.php';
 
             <div class="field-group">
                 <label for="service_name">Nama Layanan</label>
-                <input type="text" name="service_name" id="service_name" required 
-                       value="<?= htmlspecialchars($service['service_name']); ?>">
+                <input type="text" name="service_name" id="service_name" required
+                    value="<?= htmlspecialchars($service['service_name']); ?>">
             </div>
 
             <div class="field-group">
                 <label for="price">Harga (Rp)</label>
-                <input type="number" name="price" id="price" required 
-                       value="<?= htmlspecialchars($service['price']); ?>">
+                <input type="number" name="price" id="price" required
+                    value="<?= htmlspecialchars($service['price']); ?>">
             </div>
 
             <div class="field-group">
@@ -189,8 +186,8 @@ include 'includes/admin_header.php';
 
             <div class="field-group">
                 <label for="estimate">Estimasi Selesai</label>
-                <input type="text" name="estimate" id="estimate" required 
-                       value="<?= htmlspecialchars($service['estimate']); ?>">
+                <input type="text" name="estimate" id="estimate" required
+                    value="<?= htmlspecialchars($service['estimate']); ?>">
             </div>
 
             <button type="submit" class="btn-save">Simpan Perubahan</button>

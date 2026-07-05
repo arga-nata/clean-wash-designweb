@@ -1,15 +1,7 @@
 <?php
 session_start();
 
-$host = "db";
-$user = "db";
-$pass = "db";
-$db = "db";
-$conn = mysqli_connect($host, $user, $pass, $db);
-
-if (!$conn) {
-  die("Koneksi Database Gagal!");
-}
+include 'includes/connection.php';
 
 if (!isset($_SESSION['customer_id'])) {
   header("Location: login.php");

@@ -6,14 +6,7 @@ if (!isset($_SESSION['username']) || $_SESSION['username'] !== 'admin') {
     exit;
 }
 
-$host = "db";
-$user = "db";
-$pass = "db";
-$db = "db";
-$conn = mysqli_connect($host, $user, $pass, $db);
-if (!$conn) {
-    die("Koneksi Database Gagal!");
-}
+include 'includes/connection.php';
 
 $query = "SELECT o.id, c.customer_name, o.total_amount, o.status, o.order_date, 
               GROUP_CONCAT(s.service_name SEPARATOR ', ') as services 
@@ -90,6 +83,7 @@ include 'includes/admin_header.php';
         font-weight: 500;
         font-size: 0.85rem;
     }
+
     .status-pending {
         color: #dc2626;
     }

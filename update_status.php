@@ -6,15 +6,7 @@ if (empty($id) || empty($status)) {
     die('Error: ID atau Status tidak ditemukan.');
 }
 
-$host = "db";
-$user = "db";
-$pass = "db";
-$db = "db";
-$conn = mysqli_connect($host, $user, $pass, $db);
-
-if (!$conn) {
-    die("Koneksi Gagal!");
-}
+include 'includes/connection.php';
 
 $stmt = $conn->prepare("UPDATE tbl_orders SET status = ? WHERE id = ?");
 $stmt->bind_param("si", $status, $id);

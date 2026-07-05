@@ -10,121 +10,94 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['custName'])) {
   error_reporting(0);
   ini_set('display_errors', 0);
 
-  $host = "db";
-  $user = "db";
-  $pass = "db";
-  $db = "db";
+  include 'includes/connection.php';
 
-  try {
-    $conn = mysqli_connect($host, $user, $pass, $db);
-    if (!$conn)
-      throw new Exception("Koneksi Database Gagal!");
+  $name = trim(ucwords(strtolower($_POST['custName'] ?? '')));
+  $phone = trim($_POST['custPhone'] ?? '');
+  $address = trim(ucwords(strtolower($_POST['custAddress'] ?? '')));
+  $deliveryMethod = $_POST['deliveryMethod'] ?? 'Ambil Sendiri';
+  $locationArea = $_POST['locationArea'] ?? 'kota';
+  $deliveryFee = (float) ($_POST['deliveryFee'] ?? 0);
+  $total = (float) ($_POST['totalAmount'] ?? 0);
+  $cartItems = json_decode($_POST['cartData'] ?? '[]', true);
 
-    $name = trim(ucwords(strtolower($_POST['custName'] ?? '')));
-    $phone = trim($_POST['custPhone'] ?? '');
-    $address = trim(ucwords(strtolower($_POST['custAddress'] ?? '')));
-    $deliveryMethod = $_POST['deliveryMethod'] ?? 'Ambil Sendiri';
-    $locationArea = $_POST['locationArea'] ?? 'kota';
-    $deliveryFee = (float) ($_POST['deliveryFee'] ?? 0);
-    $total = (float) ($_POST['totalAmount'] ?? 0);
-    $cartItems = json_decode($_POST['cartData'] ?? '[]', true);
-
-    if (empty($name) || empty($phone) || empty($address)) {
-      throw new Exception("Nama, No. WhatsApp, dan Alamat wajib diisi lengkap!");
-    }
-    if (empty($cartItems) || !is_array($cartItems)) {
-      throw new Exception("Keranjang belanja kosong!");
-    }
-
-    mysqli_begin_transaction($conn);
-
-    $stmt = $conn->prepare("SELECT id FROM tbl_customers WHERE customer_phone = ?");
-    $stmt->bind_param("s", $phone);
-    $stmt->execute();
-    $res = $stmt->get_result();
-
-    if ($res->num_rows > 0) {
-      $customer = $res->fetch_assoc();
-      $customer_id = $customer['id'];
-    } else {
-      $stmt = $conn->prepare("INSERT INTO tbl_customers (username, password, customer_name, customer_phone, customer_address) VALUES (?, ?, ?, ?, ?)");
-      $temp_user = strtolower(str_replace(' ', '', $name)) . rand(10, 99);
-      $temp_pass = password_hash('123456', PASSWORD_DEFAULT);
-      $stmt->bind_param("sssss", $temp_user, $temp_pass, $name, $phone, $address);
-      $stmt->execute();
-      $customer_id = $conn->insert_id;
-    }
-
-    $stmt = $conn->prepare("INSERT INTO tbl_orders (customer_id, delivery_method, location_area, delivery_fee, total_amount, status) VALUES (?, ?, ?, ?, ?, 'Pending')");
-    $stmt->bind_param("issdd", $customer_id, $deliveryMethod, $locationArea, $deliveryFee, $total);
-    $stmt->execute();
-    $order_id = $conn->insert_id;
-
-    foreach ($cartItems as $item) {
-      $stmt_svc = $conn->prepare("SELECT id FROM tbl_services WHERE service_name = ?");
-      $stmt_svc->bind_param("s", $item['name']);
-      $stmt_svc->execute();
-      $res_svc = $stmt_svc->get_result();
-      $svc = $res_svc->fetch_assoc();
-      $service_id = $svc ? $svc['id'] : 1;
-
-      $subtotal = (float) ($item['price'] ?? 0) * (int) ($item['qty'] ?? 0);
-      $stmt_item = $conn->prepare("INSERT INTO tbl_order_items (order_id, service_id, qty, subtotal) VALUES (?, ?, ?, ?)");
-      $stmt_item->bind_param("iidd", $order_id, $service_id, $item['qty'], $subtotal);
-      $stmt_item->execute();
-    }
-
-    mysqli_commit($conn);
-    if (ob_get_length())
-      ob_clean();
-    header('Content-Type: application/json');
-    echo json_encode(['status' => 'success']);
-    exit;
-
-  } catch (Exception $e) {
-    if (isset($conn)) {
-      mysqli_rollback($conn);
-      mysqli_close($conn);
-    }
-    if (ob_get_length())
-      ob_clean();
-    http_response_code(500);
-    header('Content-Type: application/json');
-    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
-    exit;
+  if (empty($name) || empty($phone) || empty($address)) {
+    throw new Exception("Nama, No. WhatsApp, dan Alamat wajib diisi lengkap!");
   }
+  if (empty($cartItems) || !is_array($cartItems)) {
+    throw new Exception("Keranjang belanja kosong!");
+  }
+
+  mysqli_begin_transaction($conn);
+
+  $stmt = $conn->prepare("SELECT id FROM tbl_customers WHERE customer_phone = ?");
+  $stmt->bind_param("s", $phone);
+  $stmt->execute();
+  $res = $stmt->get_result();
+
+  if ($res->num_rows > 0) {
+    $customer = $res->fetch_assoc();
+    $customer_id = $customer['id'];
+  } else {
+    $stmt = $conn->prepare("INSERT INTO tbl_customers (username, password, customer_name, customer_phone, customer_address) VALUES (?, ?, ?, ?, ?)");
+    $temp_user = strtolower(str_replace(' ', '', $name)) . rand(10, 99);
+    $temp_pass = password_hash('123456', PASSWORD_DEFAULT);
+    $stmt->bind_param("sssss", $temp_user, $temp_pass, $name, $phone, $address);
+    $stmt->execute();
+    $customer_id = $conn->insert_id;
+  }
+
+  $stmt = $conn->prepare("INSERT INTO tbl_orders (customer_id, delivery_method, location_area, delivery_fee, total_amount, status) VALUES (?, ?, ?, ?, ?, 'Pending')");
+  $stmt->bind_param("issdd", $customer_id, $deliveryMethod, $locationArea, $deliveryFee, $total);
+  $stmt->execute();
+  $order_id = $conn->insert_id;
+
+  foreach ($cartItems as $item) {
+    $stmt_svc = $conn->prepare("SELECT id FROM tbl_services WHERE service_name = ?");
+    $stmt_svc->bind_param("s", $item['name']);
+    $stmt_svc->execute();
+    $res_svc = $stmt_svc->get_result();
+    $svc = $res_svc->fetch_assoc();
+    $service_id = $svc ? $svc['id'] : 1;
+
+    $subtotal = (float) ($item['price'] ?? 0) * (int) ($item['qty'] ?? 0);
+    $stmt_item = $conn->prepare("INSERT INTO tbl_order_items (order_id, service_id, qty, subtotal) VALUES (?, ?, ?, ?)");
+    $stmt_item->bind_param("iidd", $order_id, $service_id, $item['qty'], $subtotal);
+    $stmt_item->execute();
+  }
+
+  mysqli_commit($conn);
+  if (ob_get_length())
+    ob_clean();
+  header('Content-Type: application/json');
+  echo json_encode(['status' => 'success']);
+  exit;
+
 }
 
-// --- AMBIL DATA UNTUK TAMPILAN (Satu Koneksi) ---
 $user_data = ['customer_name' => '', 'customer_phone' => '', 'customer_address' => ''];
 $services_list = [];
 
-$host = "db";
-$user = "db";
-$pass = "db";
-$db = "db";
-$conn = mysqli_connect($host, $user, $pass, $db);
+include 'includes/connection.php';
 
 if ($conn) {
-    // 1. Ambil Data User
-    if (isset($_SESSION['customer_id'])) {
-        $cust_id = $_SESSION['customer_id'];
-        $query_user = "SELECT customer_name, customer_phone, customer_address FROM tbl_customers WHERE id = '$cust_id'";
-        $res_user = mysqli_query($conn, $query_user);
-        if ($res_user && mysqli_num_rows($res_user) > 0) {
-            $user_data = mysqli_fetch_assoc($res_user);
-        }
+  if (isset($_SESSION['customer_id'])) {
+    $cust_id = $_SESSION['customer_id'];
+    $query_user = "SELECT customer_name, customer_phone, customer_address FROM tbl_customers WHERE id = '$cust_id'";
+    $res_user = mysqli_query($conn, $query_user);
+    if ($res_user && mysqli_num_rows($res_user) > 0) {
+      $user_data = mysqli_fetch_assoc($res_user);
     }
-    
-    // 2. Ambil Data Layanan
-    $res_svc = mysqli_query($conn, "SELECT * FROM tbl_services ORDER BY service_name ASC");
-    if ($res_svc) {
-        while ($row = mysqli_fetch_assoc($res_svc)) {
-            $services_list[] = $row;
-        }
+  }
+
+  $res_svc = mysqli_query($conn, "SELECT * FROM tbl_services ORDER BY service_name ASC");
+  if ($res_svc) {
+    while ($row = mysqli_fetch_assoc($res_svc)) {
+      $services_list[] = $row;
     }
-    
-    mysqli_close($conn);
+  }
+
+  mysqli_close($conn);
 }
 ?>
 <?php include 'includes/header.php'; ?>
@@ -150,12 +123,12 @@ if ($conn) {
           <select id="serviceSelect" onchange="updatePlaceholder()">
             <option value="" disabled selected>-- Pilih Layanan --</option>
             <?php foreach ($services_list as $svc): ?>
-                <option value="<?= htmlspecialchars($svc['service_name']) ?>" 
-                        data-price="<?= $svc['price'] ?>" 
-                        data-unit="<?= htmlspecialchars($svc['unit']) ?>" 
-                        data-estimate="<?= htmlspecialchars($svc['estimate']) ?>">
-                    <?= htmlspecialchars($svc['service_name']) ?> (Rp <?= number_format($svc['price'], 0, ',', '.') ?>/<?= htmlspecialchars($svc['unit']) ?>)
-                </option>
+              <option value="<?= htmlspecialchars($svc['service_name']) ?>" data-price="<?= $svc['price'] ?>"
+                data-unit="<?= htmlspecialchars($svc['unit']) ?>"
+                data-estimate="<?= htmlspecialchars($svc['estimate']) ?>">
+                <?= htmlspecialchars($svc['service_name']) ?> (Rp
+                <?= number_format($svc['price'], 0, ',', '.') ?>/<?= htmlspecialchars($svc['unit']) ?>)
+              </option>
             <?php endforeach; ?>
           </select>
         </div>
@@ -325,4 +298,5 @@ if ($conn) {
   }
 </script>
 </body>
+
 </html>

@@ -6,7 +6,6 @@ $pass = "db";
 $db = "db";
 $conn = mysqli_connect($host, $user, $pass, $db);
 
-// Autofill Nama dari Session
 $full_name = "";
 if (isset($_SESSION['customer_id'])) {
     $cid = $_SESSION['customer_id'];
@@ -25,7 +24,6 @@ include 'includes/header.php';
         <div class="row justify-content-center">
             <div class="col-md-10">
 
-                <!-- Header Halaman -->
                 <div class="text-center mb-5">
                     <h2 class="fw-bold" style="color: #333; font-size: 2rem;">Hubungi Kami</h2>
                     <p class="text-muted">Silakan datang langsung ke lokasi kami atau kirim pesan melalui kontak
@@ -33,7 +31,6 @@ include 'includes/header.php';
                 </div>
 
                 <div class="contact-wrapper">
-                    <!-- Info Kontak (Kiri) -->
                     <div class="contact-card">
                         <div class="card-body-custom">
                             <div class="contact-item">
@@ -59,7 +56,6 @@ include 'includes/header.php';
                         </div>
                     </div>
 
-                    <!-- Form Kontak (Kanan) -->
                     <div class="contact-card">
                         <div class="card-body-custom">
                             <form id="whatsapp-contact-form">

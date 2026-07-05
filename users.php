@@ -6,14 +6,7 @@ if (!isset($_SESSION['username']) || $_SESSION['username'] !== 'admin') {
     exit;
 }
 
-$host = "db";
-$user = "db";
-$pass = "db";
-$db = "db";
-$conn = mysqli_connect($host, $user, $pass, $db);
-if (!$conn) {
-    die("Connection Failed!");
-}
+include 'includes/connection.php';
 
 $query = "SELECT * FROM tbl_customers ORDER BY (username = 'admin') DESC, id DESC";
 $result = mysqli_query($conn, $query);

@@ -6,11 +6,7 @@ if (!isset($_SESSION['username']) || $_SESSION['username'] !== 'admin') {
     exit;
 }
 
-$host = "db";
-$user = "db";
-$pass = "db";
-$db = "db";
-$conn = mysqli_connect($host, $user, $pass, $db);
+include 'includes/connection.php';
 
 if (!$conn) {
     die("Koneksi Database Gagal!");
@@ -31,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_service'])) {
     } else {
         $stmt = $conn->prepare("INSERT INTO tbl_services (service_name, price, unit, estimate) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("sdss", $name, $price, $unit, $estimate);
-        
+
         if ($stmt->execute()) {
             $message = "Layanan berhasil ditambahkan!";
             $message_type = "success";
@@ -73,8 +69,8 @@ include 'includes/admin_header.php';
     .admin-card {
         background: #ffffff;
         border-radius: 24px;
-        border: 1px solid rgba(0,0,0,0.05);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
         padding: 40px;
         margin-bottom: 30px;
     }
@@ -82,8 +78,8 @@ include 'includes/admin_header.php';
     .admin-card-table {
         background: #ffffff;
         border-radius: 24px;
-        border: 1px solid rgba(0,0,0,0.05);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
         overflow: hidden;
         margin-bottom: 30px;
     }
@@ -108,7 +104,8 @@ include 'includes/admin_header.php';
         margin-bottom: 8px;
     }
 
-    .field-group input, .field-group select {
+    .field-group input,
+    .field-group select {
         width: 100%;
         padding: 12px 16px;
         border-radius: 12px;
@@ -117,7 +114,8 @@ include 'includes/admin_header.php';
         transition: all 0.2s ease;
     }
 
-    .field-group input:focus, .field-group select:focus {
+    .field-group input:focus,
+    .field-group select:focus {
         outline: none;
         border-color: #49b1c8;
         box-shadow: 0 0 0 3px rgba(73, 177, 200, 0.1);
@@ -205,7 +203,8 @@ include 'includes/admin_header.php';
 <div class="admin-main-wrapper">
     <div class="admin-card">
         <?php if ($message): ?>
-            <div class="alert alert-<?= $message_type; ?> text-center" style="border-radius: 12px; font-size: 0.9rem; margin-bottom: 20px;">
+            <div class="alert alert-<?= $message_type; ?> text-center"
+                style="border-radius: 12px; font-size: 0.9rem; margin-bottom: 20px;">
                 <?= $message; ?>
             </div>
         <?php endif; ?>
@@ -259,10 +258,10 @@ include 'includes/admin_header.php';
                                 <td><?= $row['estimate']; ?></td>
                                 <td>
                                     <div class="d-flex gap-2 justify-content-center">
-                                        <a href="edit_service.php?id=<?= $row['id']; ?>" class="btn-admin-outline" title="Edit">Edit</a>
-                                        <a href="services.php?delete=<?= $row['id']; ?>" 
-                                           class="btn-admin-outline" 
-                                           onclick="return confirm('Hapus layanan ini?')" title="Hapus">
+                                        <a href="edit_service.php?id=<?= $row['id']; ?>" class="btn-admin-outline"
+                                            title="Edit">Edit</a>
+                                        <a href="services.php?delete=<?= $row['id']; ?>" class="btn-admin-outline"
+                                            onclick="return confirm('Hapus layanan ini?')" title="Hapus">
                                             ✕
                                         </a>
                                     </div>
@@ -271,7 +270,8 @@ include 'includes/admin_header.php';
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5" style="text-align:center; padding: 40px; color: #94a3b8;">Belum ada layanan tersedia.</td>
+                            <td colspan="5" style="text-align:center; padding: 40px; color: #94a3b8;">Belum ada layanan
+                                tersedia.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
